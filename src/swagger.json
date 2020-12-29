@@ -1,0 +1,722 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Kloutkast Application API",
+    "description": "Description API doc",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "localhost:4000",
+  "basePath": "/v1",
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "API for authentication in the system"
+    },
+    {
+      "name": "Users",
+      "description": "API for users in the system"
+    },
+    {
+      "name": "Categories",
+      "description": "API for categories in the system"
+    },
+    {
+      "name": "Experiences",
+      "description": "API for experiences in the system"
+    },
+    {
+      "name": "Hosts",
+      "description": "API for host in the system"
+    }
+  ],
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "description": "Register new user in system",
+        "parameters": [
+          {
+            "name": "registerParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/registerParams"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "description": "login to system",
+        "parameters": [
+          {
+            "name": "loginParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/loginParams"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "description": "logout system",
+        "parameters": [
+          {
+            "name": "logoutParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/refreshTokenParams"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh-tokens": {
+      "post": {
+        "tags": ["Authentication"],
+        "description": "refresh token of system",
+        "parameters": [
+          {
+            "name": "refreshTokenParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/refreshTokenParams"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "description": "change password",
+        "parameters": [
+          {
+            "name": "changePasswordParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/changePasswordParams"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "description": "fotgot password",
+        "parameters": [
+          {
+            "name": "forgotPasswordParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/forgotPasswordParams"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "description": "reset password",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "body",
+            "name": "resetPasswordParams",
+            "schema": {
+              "$ref": "#/definitions/resetPasswordParams"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/auth/google-login": {
+      "post": {
+        "tags": ["Authentication"],
+        "description": "google login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "googleLoginParams",
+            "schema": {
+              "$ref": "#/definitions/googleLoginParams"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get all users in system",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/users/{userId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "description": "ID of user that we want to find",
+          "type": "string"
+        }
+      ],
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get user with given ID",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete user with given ID",
+        "tags": ["Users"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update user with give ID",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "User with new values of properties",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/categories": {
+      "post": {
+        "tags": ["Categories"],
+        "summary": "Create a category",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "categoryParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/categoryParams"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/categories/search": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Search list categories",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/experiences": {
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Create a experience",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "experienceParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/experienceParams"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Experiences"],
+        "summary": "Get all categories in system",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/experiences/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of experience that we want to find",
+          "type": "string"
+        }
+      ],
+      "get": {
+        "tags": ["Experiences"],
+        "summary": "Get experience with given ID",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/experiences/filter": {
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Filter experience",
+        "parameters": [
+          {
+            "name": "experienceFilterParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/experienceFilterParams"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/hosts": {
+      "get": {
+        "tags": ["Hosts"],
+        "summary": "Get all hosts in system",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/hosts/{userId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "description": "ID of host that we want to find",
+          "type": "string"
+        }
+      ],
+      "get": {
+        "tags": ["Hosts"],
+        "summary": "Get host with given ID",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "registerParams": {
+      "required": ["fullname", "email", "password"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "fullname": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "loginParams": {
+      "required": ["email", "password"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "categoryParams": {
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "refreshTokenParams": {
+      "required": ["refreshToken"],
+      "properties": {
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
+    "forgotPasswordParams": {
+      "required": ["email"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "uniqueItems": true
+        }
+      }
+    },
+    "resetPasswordParams": {
+      "required": ["password"],
+      "properties": {
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "googleLoginParams": {
+      "required": ["code"],
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "changePasswordParams": {
+      "required": ["password, newPassword, userId"],
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "newPassword": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "setFirstPass": {
+          "type": "boolean"
+        }
+      }
+    },
+    "experienceParams": {
+      "required": ["title"],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "integer"
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "startDay": {
+          "type": "string"
+        },
+        "endDay": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dateAvaibility": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "string"
+              },
+              "startTime": {
+                "type": "string"
+              },
+              "endTime": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "experienceFilterParams": {
+      "required": ["title"],
+      "properties": {
+        "minPrice": {
+          "type": "integer"
+        },
+        "maxPrice": {
+          "type": "integer"
+        },
+        "startDay": {
+          "type": "string"
+        },
+        "endDay": {
+          "type": "string"
+        },
+        "categoryName": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "User": {
+      "properties": {
+        "email": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "fullname": {
+          "type": "string"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "aboutMe": {
+          "type": "string"
+        }
+      }
+    },
+    "Users": {
+      "type": "array",
+      "$ref": "#/definitions/User"
+    },
+    "Error": {
+      "required": ["error"],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": ["status", "message"],
+          "properties": {
+            "status": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
