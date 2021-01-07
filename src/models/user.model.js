@@ -61,6 +61,15 @@ const userSchema = mongoose.Schema(
     joinDay: {
       type: Date,
     },
+    location: {
+      type: String,
+    },
+    paymentInfo: {
+      type: Array,
+    },
+    bankInfo: {
+      type: Array,
+    },
   },
   {
     timestamps: true,

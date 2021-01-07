@@ -37,24 +37,53 @@ const updateUser = {
   params: Joi.object().keys({
     userId: Joi.required().custom(objectId),
   }),
-  body: Joi.object()
-    .keys({
-      email: Joi.string().email(),
-      password: Joi.string().custom(password),
-      dateOfBirth: Joi.date(),
-      fullname: Joi.string(),
-      avatarUrl: Joi.string(),
-      categoryName: Joi.string(),
-      aboutMe: Joi.string(),
-      isHost: Joi.boolean(),
-      joinDay: Joi.date(),
-    })
-    .min(1),
+  // body: Joi.object()
+  //   .keys({
+  //     email: Joi.string().email(),
+  //     password: Joi.string().custom(password),
+  //     dateOfBirth: Joi.date(),
+  //     fullname: Joi.string(),
+  //     avatarUrl: Joi.string(),
+  //     categoryName: Joi.string(),
+  //     aboutMe: Joi.string(),
+  //     isHost: Joi.boolean(),
+  //     joinDay: Joi.date(),
+  //   })
+  //   .min(1),
 };
 
 const deleteUser = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
+  }),
+};
+
+const checkUserID = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+  }),
+};
+
+const removeCard = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+    idx: Joi.number().required().integer(),
+  }),
+  body: Joi.object().keys({
+    stripeCustomerID: Joi.string().required(),
+    cardType: Joi.string().required(),
+    cardNumber: Joi.string().required(),
+  }),
+};
+
+const removeBank = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+    idx: Joi.number().required().integer(),
+  }),
+  body: Joi.object().keys({
+    bankName: Joi.string().required(),
+    bankNumber: Joi.string().required(),
   }),
 };
 
@@ -65,4 +94,7 @@ module.exports = {
   updateUser,
   deleteUser,
   getHosts,
+  checkUserID,
+  removeCard,
+  removeBank,
 };

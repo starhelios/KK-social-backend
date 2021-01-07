@@ -24,4 +24,18 @@ router
   .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
+router
+  .route('/upload-avatar/:userId')
+  .patch(auth('manageUsers'), validate(userValidation.checkUserID), userController.uploadAvatar);
+
+router.route('/card/:userId').post(auth('manageUsers'), validate(userValidation.checkUserID), userController.addCard);
+router
+  .route('/card/:userId/:idx')
+  .delete(auth('manageUsers'), validate(userValidation.removeCard), userController.deleteCard);
+
+router.route('/bank/:userId').post(auth('manageUsers'), validate(userValidation.checkUserID), userController.addBank);
+router
+  .route('/bank/:userId/:idx')
+  .delete(auth('manageUsers'), validate(userValidation.removeBank), userController.deleteBank);
+
 module.exports = router;
