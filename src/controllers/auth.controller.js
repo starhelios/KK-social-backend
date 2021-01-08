@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const fetch = require('node-fetch');
 const catchAsync = require('../utils/catchAsync');
 const googleOAuth = require('../utils/googleOAuth');
 const { userService, authService, tokenService, emailService } = require('../services');
@@ -21,11 +22,17 @@ const login = catchAsync(async (req, res) => {
 });
 
 const googleLogin = catchAsync(async (req, res) => {
-  const { code } = req.body;
-  const profile = await googleOAuth.getProfileInfo(code);
+  const { code, accessToken } = req.body;
+  let profile;
+  if (code) {
+    profile = await googleOAuth.getProfileInfo(code);
+  } else if (accessToken) {
+    const response = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`);
+    profile = await response.json();
+  }
 
   const userGoogle = {
-    googleId: profile.sub,
+    googleId: profile.id,
     name: profile.name,
     firstName: profile.given_name,
     lastName: profile.family_name,
