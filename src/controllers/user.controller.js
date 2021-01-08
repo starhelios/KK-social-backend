@@ -96,35 +96,33 @@ const uploadAvatar = catchAsync(async (req, res) => {
 });
 
 const addCard = catchAsync(async (req, res) => {
-  let user = await userService.getUserById(req.params.userId);
-  user = await userService.updateUserById(req.params.userId, { paymentInfo: [...user.paymentInfo, req.body] });
+  const user = await userService.getUserById(req.params.userId);
+  user.paymentInfo.push(req.body);
+  user.save();
 
   res.send(generateResponse(true, user, 'Add Card successed!'));
 });
 
 const deleteCard = catchAsync(async (req, res) => {
-  let user = await userService.getUserById(req.params.userId);
-  user.paymentInfo.splice(req.params.cardIdx, 1);
-  user = await userService.updateUserById(req.params.userId, {
-    paymentInfo: user.paymentInfo,
-  });
+  const user = await userService.getUserById(req.params.userId);
+  user.paymentInfo.id(req.params.id).remove();
+  user.save();
 
   res.send(generateResponse(true, user, 'Delete Card successed!'));
 });
 
 const addBank = catchAsync(async (req, res) => {
-  let user = await userService.getUserById(req.params.userId);
-  user = await userService.updateUserById(req.params.userId, { bankInfo: [...user.bankInfo, req.body] });
+  const user = await userService.getUserById(req.params.userId);
+  user.bankInfo.push(req.body);
+  user.save();
 
   res.send(generateResponse(true, user, 'Add Bank successed!'));
 });
 
 const deleteBank = catchAsync(async (req, res) => {
-  let user = await userService.getUserById(req.params.userId);
-  user.bankInfo.splice(req.params.cardIdx, 1);
-  user = await userService.updateUserById(req.params.userId, {
-    bankInfo: user.bankInfo,
-  });
+  const user = await userService.getUserById(req.params.userId);
+  user.bankInfo.id(req.params.id).remove();
+  user.save();
 
   res.send(generateResponse(true, user, 'Delete Bank successed!'));
 });

@@ -3,6 +3,32 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 
+const paymentInfo = mongoose.Schema({
+  stripeCustomerID: {
+    type: String,
+    required: true,
+  },
+  cardType: {
+    type: String,
+    required: true,
+  },
+  cardNumber: {
+    type: String,
+    required: true,
+  },
+});
+
+const bankInfo = mongoose.Schema({
+  bankName: {
+    type: String,
+    required: true,
+  },
+  bankNumber: {
+    type: String,
+    required: true,
+  },
+});
+
 const userSchema = mongoose.Schema(
   {
     fullname: {
@@ -64,12 +90,8 @@ const userSchema = mongoose.Schema(
     location: {
       type: String,
     },
-    paymentInfo: {
-      type: Array,
-    },
-    bankInfo: {
-      type: Array,
-    },
+    paymentInfo: [paymentInfo],
+    bankInfo: [bankInfo],
   },
   {
     timestamps: true,
