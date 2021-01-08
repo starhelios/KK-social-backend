@@ -51,6 +51,18 @@ const userSchema = mongoose.Schema(
     categoryName: {
       type: String,
     },
+    availableMethods: {
+      type: Array,
+      default: [],
+    },
+    stripeCustomerID: {
+      type: String,
+      default: '',
+    },
+    stripeConnectID: {
+      type: String,
+      default: '',
+    },
     aboutMe: {
       type: String,
     },
