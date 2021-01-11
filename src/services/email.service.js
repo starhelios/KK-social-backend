@@ -1,4 +1,5 @@
 const sgMail = require('@sendgrid/mail');
+const moment = require('moment');
 require('dotenv').config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -27,7 +28,23 @@ const sendResetPasswordEmail = async (to, token) => {
   await sendEmail(to, subject, text);
 };
 
+const sendPurchaseConfirmationEmail = async (to, experience_name, host_name) => {
+  const subject = `KloutKast booking confirmation #${moment().format('DD-MM-YYYY HH:mm')}`;
+  // replace this url with the link to the reset password page of your front-end app
+  // const resetPasswordUrl = `${process.env.FRONTENT_ENDPOINT}?token=${token}`;
+  const text = `Dear user,
+  This is your confirmation email for booking experience: ${experience_name} with ${host_name}.
+  Your host has been notified.
+  
+  Regards,
+
+  KloutKast Team`;
+  console.log('email sent');
+  await sendEmail(to, subject, text);
+};
+
 module.exports = {
   sendEmail,
   sendResetPasswordEmail,
+  sendPurchaseConfirmationEmail,
 };
