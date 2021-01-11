@@ -326,6 +326,183 @@
         }
       }
     },
+    "/upload-avatar/{userId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "description": "ID of user that we want to find",
+          "type": "string"
+        }
+      ],
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Upload a avatar file",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "avatar",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UserAvatar"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/card/{userId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "description": "ID of user that we want to find",
+          "type": "string"
+        }
+      ],
+      "post": {
+        "tags": ["Users"],
+        "summary": "Add a card to User",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "avatar",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/AddCard"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/card/{userId}/{cardId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "description": "ID of user that we want to find",
+          "type": "string"
+        },
+        {
+          "name": "cardId",
+          "in": "path",
+          "required": true,
+          "description": "ID of card that we want to delete",
+          "type": "string"
+        }
+      ],
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete a card from User",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/bank/{userId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "description": "ID of user that we want to find",
+          "type": "string"
+        }
+      ],
+      "post": {
+        "tags": ["Users"],
+        "summary": "Add a bank information to User",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "avatar",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/AddBank"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/bank/{userId}/{bankId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "description": "ID of user that we want to find",
+          "type": "string"
+        },
+        {
+          "name": "bankId",
+          "in": "path",
+          "required": true,
+          "description": "ID of bank info obj that we want to delete",
+          "type": "string"
+        }
+      ],
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete a Bank Information from User",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/categories": {
       "post": {
         "tags": ["Categories"],
@@ -465,6 +642,59 @@
             "in": "body",
             "schema": {
               "$ref": "#/definitions/experienceFilterParams"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/experiences/dates/{experienceId}": {
+      "parameters": [
+        {
+          "name": "experienceId",
+          "in": "path",
+          "required": true,
+          "description": "ID of experience that we want to find",
+          "type": "string"
+        }
+      ],
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Add date availabilities to experience",
+        "parameters": [
+          {
+            "name": "dateAvailabilities",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/dateAvailability"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Experiences"],
+        "summary": "Remove date availabilities to experience",
+        "parameters": [
+          {
+            "name": "dateAvailability Ids",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/dateAvailabilityIds"
             }
           }
         ],
@@ -677,6 +907,37 @@
         }
       }
     },
+    "dateAvailability": {
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "string"
+              },
+              "startTime": {
+                "type": "string"
+              },
+              "endTime": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "dateAvailabilityIds": {
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "User": {
       "properties": {
         "email": {
@@ -700,6 +961,36 @@
     "Users": {
       "type": "array",
       "$ref": "#/definitions/User"
+    },
+    "UserAvatar": {
+      "properties": {
+        "avatar": {
+          "type": "file"
+        }
+      }
+    },
+    "AddCard": {
+      "properties": {
+        "stripeCustomerID": {
+          "type": "string"
+        },
+        "cardType": {
+          "type": "string"
+        },
+        "cardNumber": {
+          "type": "string"
+        }
+      }
+    },
+    "AddBank": {
+      "properties": {
+        "bankName": {
+          "type": "string"
+        },
+        "bankNumber": {
+          "type": "string"
+        }
+      }
     },
     "Error": {
       "required": ["error"],

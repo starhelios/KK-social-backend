@@ -61,6 +61,47 @@ const deleteUser = {
   }),
 };
 
+const checkUserID = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+  }),
+};
+
+const addCard = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    stripeCustomerID: Joi.string().required(),
+    cardType: Joi.string().required(),
+    cardNumber: Joi.string().required(),
+  }),
+};
+
+const removeCard = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+    id: Joi.string().required(),
+  }),
+};
+
+const addBank = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    bankName: Joi.string().required(),
+    bankNumber: Joi.string().required(),
+  }),
+};
+
+const removeBank = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+    id: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   createUser,
   getUsers,
@@ -68,4 +109,9 @@ module.exports = {
   updateUser,
   deleteUser,
   getHosts,
+  checkUserID,
+  addCard,
+  addBank,
+  removeCard,
+  removeBank,
 };

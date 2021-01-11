@@ -3,7 +3,23 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
+const { categoryService } = require('../services');
 const { generateResponse } = require('../utils/utils');
+const Category = require('../models/category.model');
+
+const mimeMatch = {
+  'image/png': 'png',
+  'image/tiff': 'tif',
+  'image/vnd.wap.wbmp': 'wbmp',
+  'image/x-icon': 'ico',
+  'image/x-jng': 'jng',
+  'image/x-ms-bmp': 'bmp',
+  'image/svg+xml': 'svg',
+  'image/webp': 'webp',
+  'image/jpeg': 'jpg',
+};
+
+const storagePath = `${__dirname}/../../public/avatar`;
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -45,7 +61,21 @@ const getHosts = catchAsync(async (req, res) => {
 });
 
 const updateUser = catchAsync(async (req, res) => {
-  const user = await userService.updateUserById(req.params.userId, req.body);
+  let reqBody = req.body;
+  if (req.files && req.files.avatar) {
+    const avatar = req.files.avatar;
+    const fileName = `${req.params.userId}.${mimeMatch[avatar.mimetype]}`;
+    avatar.mv(`${storagePath}/${fileName}`);
+    const avatarUrl = `http://${req.get('host')}/avatar/${fileName}`;
+    reqBody = { ...req.body, avatarUrl };
+  }
+  if (req.body.categoryName) {
+    const newCategoryName = req.body.categoryName.toLowerCase();
+    const categories = await Category.find({ name: newCategoryName }, { name: 1 }).exec();
+    if (categories.length === 0) await categoryService.createCategory({ name: newCategoryName });
+  }
+
+  const user = await userService.updateUserById(req.params.userId, reqBody);
 
   res.send(generateResponse(true, user, 'Change user info successed!'));
 });
@@ -53,6 +83,48 @@ const updateUser = catchAsync(async (req, res) => {
 const deleteUser = catchAsync(async (req, res) => {
   await userService.deleteUserById(req.params.userId);
   res.status(httpStatus.NO_CONTENT).send();
+});
+
+const uploadAvatar = catchAsync(async (req, res) => {
+  const avatar = req.files.avatar;
+  const fileName = `${req.params.userId}.${mimeMatch[avatar.mimetype]}`;
+  avatar.mv(`${storagePath}/${fileName}`);
+  const avatarUrl = `http://${req.get('host')}/avatar/${fileName}`;
+  const user = await userService.updateUserById(req.params.userId, { avatarUrl });
+
+  res.send(generateResponse(true, user, 'Upload avatar successed!'));
+});
+
+const addCard = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.paymentInfo.push(req.body);
+  user.save();
+
+  res.send(generateResponse(true, user, 'Add Card successed!'));
+});
+
+const deleteCard = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.paymentInfo.id(req.params.id).remove();
+  user.save();
+
+  res.send(generateResponse(true, user, 'Delete Card successed!'));
+});
+
+const addBank = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bankInfo.push(req.body);
+  user.save();
+
+  res.send(generateResponse(true, user, 'Add Bank successed!'));
+});
+
+const deleteBank = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bankInfo.id(req.params.id).remove();
+  user.save();
+
+  res.send(generateResponse(true, user, 'Delete Bank successed!'));
 });
 
 module.exports = {
@@ -63,4 +135,9 @@ module.exports = {
   deleteUser,
   getHosts,
   getHost,
+  uploadAvatar,
+  addCard,
+  deleteCard,
+  addBank,
+  deleteBank,
 };
