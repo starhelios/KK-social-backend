@@ -744,6 +744,64 @@
           }
         }
       }
+    },
+    "/tutorials": {
+      "get": {
+        "tags": ["Tutorials"],
+        "summary": "Get Tutorials",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tutorials"],
+        "summary": "Create a new tutorial",
+        "parameters": [
+          {
+            "name": "tutorial",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateTutorial"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "tutorials/{tutorialID}": {
+      "parameters": [
+        {
+          "name": "tutorialID",
+          "in": "path",
+          "required": true,
+          "description": "ID of tutorial that we want to find",
+          "type": "string"
+        }
+      ],
+      "delete": {
+        "tags": ["Tutorials"],
+        "summary": "Remove Tutorial By ID",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -988,6 +1046,16 @@
           "type": "string"
         },
         "bankNumber": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateTutorial" : {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "image": {
           "type": "string"
         }
       }

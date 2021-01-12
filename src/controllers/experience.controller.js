@@ -1,7 +1,8 @@
 const httpStatus = require('http-status');
+const moment = require('moment');
 // const pick = require('../utils/pick');
 // const ApiError = require('../utils/ApiError');
-const { expression } = require('@hapi/joi');
+// const { expression } = require('@hapi/joi');
 const catchAsync = require('../utils/catchAsync');
 const { experienceService, userService } = require('../services');
 const { generateResponse } = require('../utils/utils');
@@ -15,7 +16,7 @@ const createExperience = catchAsync(async (req, res) => {
 });
 
 const getAll = catchAsync(async (req, res) => {
-  console.log(req.query);
+  // console.log(req.query);
   const result = await experienceService.getAll(req.query);
 
   res.status(httpStatus.OK).send(generateResponse(true, result));

@@ -5,3 +5,4 @@ module.exports.emailService = require('./email.service');
 module.exports.categoryService = require('./category.service');
 module.exports.experienceService = require('./experience.service');
 module.exports.paymentService = require('./payment.service');
+module.exports.tutorialService = require('./tutorial.service');
