@@ -15,9 +15,4 @@ router.post('/filter', validate({}), experienceController.filterExperience);
 
 router.route('/:id').get(validate(experienceValidation.getById), experienceController.getExperience);
 
-router
-  .route('/dates/:id')
-  .post(validate(experienceValidation.addDateAvaibility), experienceController.addDateAvaibility)
-  .delete(validate(experienceValidation.removeDateAvaibility), experienceController.removeDateAvaibility);
-
 module.exports = router;

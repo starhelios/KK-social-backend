@@ -28,30 +28,10 @@ const getById = {
   }),
 };
 
-const addDateAvaibility = {
-  params: Joi.object().keys({
-    id: Joi.string().custom(objectId),
-  }),
-  body: Joi.object().keys({
-    items: Joi.array().items(dateAvaibility),
-  }),
-};
-
-const removeDateAvaibility = {
-  params: Joi.object().keys({
-    id: Joi.string().custom(objectId),
-  }),
-  body: Joi.object().keys({
-    ids: Joi.array().items(Joi.string()),
-  }),
-};
-
 const getAll = {};
 
 module.exports = {
   createExperience,
   getAll,
   getById,
-  addDateAvaibility,
-  removeDateAvaibility,
 };

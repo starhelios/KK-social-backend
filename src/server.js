@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -53,12 +52,6 @@ app.options('*', cors());
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 
-app.use(
-  fileUpload({
-    createParentPath: true,
-  })
-);
-
 // v1 api routes
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/v1', routes);
@@ -73,8 +66,6 @@ app.use((error, req, res, next) => {
     },
   });
 });
-
-app.use(express.static(`${__dirname}/../public`));
 
 app.listen(port, () => {
   mongoose.connect(process.env.DATABASE, {

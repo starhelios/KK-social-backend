@@ -6,9 +6,13 @@ const paymentController = require('../../controllers/payments.controller');
 
 const router = express.Router();
 
-router.route('/generate/account_link/:userId').get(auth(), validate({}), paymentController.generateAccountLink);
+router.route('/generate/account_link').get(auth(), validate({}), paymentController.generateAccountLink);
 
 router.route('/charge-generate-intent/experience').post(auth(), validate({}), paymentController.chargeCustomer);
-router.route('/stripe/webhook').post(validate({}), paymentController.generateAccountLink);
+router.route('/methods/card').post(auth(), validate({}), paymentController.savePaymentMethod);
+router.route('/save-transaction').post(auth(), validate({}), paymentController.savePaymentTransactionInDB);
+router.route('/delete-payment-method').post(auth(), validate({}), paymentController.deletePaymentMethod);
+
+// router.route('/stripe/webhook').post(validate({}), paymentController.generateAccountLink);
 
 module.exports = router;

@@ -52,42 +52,21 @@ const filterExperience = catchAsync(async (req, res) => {
 });
 
 const getExperience = catchAsync(async (req, res) => {
+  console.log(req.user);
   const experience = await experienceService.getExperienceById(req.params.id);
   if (!experience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
 
   const user = await userService.getUserById(experience.userId);
-  experience.userId = user;
 
   if (user) {
-    res.send(generateResponse(true, { experience }));
+    res.send(
+      generateResponse(true, { experience, fullname: user.fullname, avatarUrl: user.avatarUrl, aboutMe: user.aboutMe })
+    );
   } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
-});
-
-const addDateAvaibility = catchAsync(async (req, res) => {
-  const experience = await experienceService.getExperienceById(req.params.id);
-  if (!experience) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
-  }
-
-  req.body.items.forEach((item) => experience.dateAvaibility.push(item));
-  experience.save();
-
-  res.send(generateResponse(true, { experience }));
-});
-
-const removeDateAvaibility = catchAsync(async (req, res) => {
-  const experience = await experienceService.getExperienceById(req.params.id);
-  if (!experience) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
-  }
-  req.body.ids.forEach((item) => experience.dateAvaibility.id(item).remove());
-  experience.save();
-
-  res.send(generateResponse(true, { experience }));
 });
 
 module.exports = {
@@ -95,6 +74,4 @@ module.exports = {
   getAll,
   filterExperience,
   getExperience,
-  addDateAvaibility,
-  removeDateAvaibility,
 };

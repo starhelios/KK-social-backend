@@ -18,8 +18,7 @@ const login = {
 
 const googleLogin = {
   body: Joi.object().keys({
-    code: Joi.string(),
-    accessToken: Joi.string(),
+    code: Joi.string().required(),
   }),
 };
 
