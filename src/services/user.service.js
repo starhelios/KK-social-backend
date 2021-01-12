@@ -44,22 +44,16 @@ const updateUserById = async (userId, updateBody) => {
     }
   }
   if (user.isHost) {
-    console.log('user is');
     if ('stripeConnectID' in user) {
-      console.log('stripe connect id does exist');
       if (!user.stripeConnectID.length > 0) {
         const getStripeConnectID = await createStripeConnectAccount(user._id);
-        console.log(getStripeConnectID);
         user[`stripeConnectID`] = getStripeConnectID;
       }
     } else {
-      console.log('stripe connect id does not exist');
       const getStripeConnectID = await createStripeConnectAccount(user._id);
       user[`stripeConnectID`] = getStripeConnectID;
     }
   }
-  console.log(updateBody);
-  console.log(user);
   await user.save();
   return user;
 };

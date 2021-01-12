@@ -11,8 +11,7 @@
   },
   "host": "localhost:4000",
   "basePath": "/v1",
-  "tags": [
-    {
+  "tags": [{
       "name": "Authentication",
       "description": "API for authentication in the system"
     },
@@ -31,6 +30,10 @@
     {
       "name": "Hosts",
       "description": "API for host in the system"
+    },
+    {
+      "name": "Payments",
+      "description": "API for payments system host/customers."
     }
   ],
   "schemes": ["http"],
@@ -41,15 +44,13 @@
       "post": {
         "tags": ["Authentication"],
         "description": "Register new user in system",
-        "parameters": [
-          {
-            "name": "registerParams",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/registerParams"
-            }
+        "parameters": [{
+          "name": "registerParams",
+          "in": "body",
+          "schema": {
+            "$ref": "#/definitions/registerParams"
           }
-        ],
+        }],
         "produces": ["application/json"],
         "responses": {
           "default": {
@@ -65,15 +66,13 @@
       "post": {
         "tags": ["Authentication"],
         "description": "login to system",
-        "parameters": [
-          {
-            "name": "loginParams",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/loginParams"
-            }
+        "parameters": [{
+          "name": "loginParams",
+          "in": "body",
+          "schema": {
+            "$ref": "#/definitions/loginParams"
           }
-        ],
+        }],
         "produces": ["application/json"],
         "responses": {
           "default": {
@@ -89,15 +88,13 @@
       "post": {
         "tags": ["Authentication"],
         "description": "logout system",
-        "parameters": [
-          {
-            "name": "logoutParams",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/refreshTokenParams"
-            }
+        "parameters": [{
+          "name": "logoutParams",
+          "in": "body",
+          "schema": {
+            "$ref": "#/definitions/refreshTokenParams"
           }
-        ],
+        }],
         "produces": ["application/json"],
         "responses": {
           "default": {
@@ -113,15 +110,13 @@
       "post": {
         "tags": ["Authentication"],
         "description": "refresh token of system",
-        "parameters": [
-          {
-            "name": "refreshTokenParams",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/refreshTokenParams"
-            }
+        "parameters": [{
+          "name": "refreshTokenParams",
+          "in": "body",
+          "schema": {
+            "$ref": "#/definitions/refreshTokenParams"
           }
-        ],
+        }],
         "produces": ["application/json"],
         "responses": {
           "default": {
@@ -137,15 +132,13 @@
       "post": {
         "tags": ["Authentication"],
         "description": "change password",
-        "parameters": [
-          {
-            "name": "changePasswordParams",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/changePasswordParams"
-            }
+        "parameters": [{
+          "name": "changePasswordParams",
+          "in": "body",
+          "schema": {
+            "$ref": "#/definitions/changePasswordParams"
           }
-        ],
+        }],
         "produces": ["application/json"],
         "responses": {
           "default": {
@@ -161,15 +154,13 @@
       "post": {
         "tags": ["Authentication"],
         "description": "fotgot password",
-        "parameters": [
-          {
-            "name": "forgotPasswordParams",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/forgotPasswordParams"
-            }
+        "parameters": [{
+          "name": "forgotPasswordParams",
+          "in": "body",
+          "schema": {
+            "$ref": "#/definitions/forgotPasswordParams"
           }
-        ],
+        }],
         "produces": ["application/json"],
         "responses": {
           "default": {
@@ -185,8 +176,7 @@
       "post": {
         "tags": ["Authentication"],
         "description": "reset password",
-        "parameters": [
-          {
+        "parameters": [{
             "in": "query",
             "name": "token",
             "required": true,
@@ -217,16 +207,151 @@
       "post": {
         "tags": ["Authentication"],
         "description": "google login",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "googleLoginParams",
+        "parameters": [{
+          "in": "body",
+          "name": "googleLoginParams",
+          "schema": {
+            "$ref": "#/definitions/googleLoginParams"
+          }
+        }],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/googleLoginParams"
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/generate/account_link": {
+      "get": {
+        "tags": ["Payments"],
+        "summary": "Get stripe account link for hosts.",
+        "parameters": [{
+          "in": "header",
+          "name": "Authorization",
+          "description": "JWT token",
+          "required": true,
+          "type": "string"
+        }],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/charge-generate-intent/experience": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Create a payment intent(charge with unique id). This unique id will be used by UI to charge cards.",
+        "parameters": [{
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "chargeExperienceParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/chargeExperienceParams"
             }
           }
         ],
-        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/methods/card": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Add payment Card to stripe and save in database..",
+        "parameters": [{
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "addPaymentCardParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/addPaymentCardParams"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/save-transaction": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Save transaction details in database when succsefully completed..",
+        "parameters": [{
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "saveTransactionsParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/saveTransactionsParams"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/delete-payment-method": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Delete payment method.",
+        "parameters": [{
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "deletePaymentMethodParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/deletePaymentMethodParams"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "Unexpected error",
@@ -241,15 +366,13 @@
       "get": {
         "tags": ["Users"],
         "summary": "Get all users in system",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Authorization",
-            "description": "JWT token",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [{
+          "in": "header",
+          "name": "Authorization",
+          "description": "JWT token",
+          "required": true,
+          "type": "string"
+        }],
         "responses": {
           "default": {
             "description": "Unexpected error",
@@ -261,27 +384,23 @@
       }
     },
     "/users/{userId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "description": "ID of user that we want to find",
-          "type": "string"
-        }
-      ],
+      "parameters": [{
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "description": "ID of user that we want to find",
+        "type": "string"
+      }],
       "get": {
         "tags": ["Users"],
         "summary": "Get user with given ID",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Authorization",
-            "description": "JWT token",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [{
+          "in": "header",
+          "name": "Authorization",
+          "description": "JWT token",
+          "required": true,
+          "type": "string"
+        }],
         "responses": {
           "default": {
             "description": "Unexpected error",
@@ -306,16 +425,14 @@
       "patch": {
         "summary": "Update user with give ID",
         "tags": ["Users"],
-        "parameters": [
-          {
-            "name": "user",
-            "in": "body",
-            "description": "User with new values of properties",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
+        "parameters": [{
+          "name": "user",
+          "in": "body",
+          "description": "User with new values of properties",
+          "schema": {
+            "$ref": "#/definitions/User"
           }
-        ],
+        }],
         "responses": {
           "default": {
             "description": "Unexpected error",
@@ -507,8 +624,7 @@
       "post": {
         "tags": ["Categories"],
         "summary": "Create a category",
-        "parameters": [
-          {
+        "parameters": [{
             "in": "header",
             "name": "Authorization",
             "description": "JWT token",
@@ -537,16 +653,14 @@
       "get": {
         "tags": ["Categories"],
         "summary": "Search list categories",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "q",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+        "parameters": [{
+          "in": "query",
+          "name": "q",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        }],
         "responses": {
           "default": {
             "description": "Unexpected error",
@@ -561,8 +675,7 @@
       "post": {
         "tags": ["Experiences"],
         "summary": "Create a experience",
-        "parameters": [
-          {
+        "parameters": [{
             "in": "header",
             "name": "Authorization",
             "description": "JWT token",
@@ -589,16 +702,14 @@
       "get": {
         "tags": ["Experiences"],
         "summary": "Get all categories in system",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "userId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+        "parameters": [{
+          "in": "query",
+          "name": "userId",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
+        }],
         "responses": {
           "default": {
             "description": "Unexpected error",
@@ -610,15 +721,13 @@
       }
     },
     "/experiences/{id}": {
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "description": "ID of experience that we want to find",
-          "type": "string"
-        }
-      ],
+      "parameters": [{
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "ID of experience that we want to find",
+        "type": "string"
+      }],
       "get": {
         "tags": ["Experiences"],
         "summary": "Get experience with given ID",
@@ -636,15 +745,13 @@
       "post": {
         "tags": ["Experiences"],
         "summary": "Filter experience",
-        "parameters": [
-          {
-            "name": "experienceFilterParams",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/experienceFilterParams"
-            }
+        "parameters": [{
+          "name": "experienceFilterParams",
+          "in": "body",
+          "schema": {
+            "$ref": "#/definitions/experienceFilterParams"
           }
-        ],
+        }],
         "responses": {
           "default": {
             "description": "Unexpected error",
@@ -723,15 +830,13 @@
       }
     },
     "/hosts/{userId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "description": "ID of host that we want to find",
-          "type": "string"
-        }
-      ],
+      "parameters": [{
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "description": "ID of host that we want to find",
+        "type": "string"
+      }],
       "get": {
         "tags": ["Hosts"],
         "summary": "Get host with given ID",
@@ -836,6 +941,56 @@
       "required": ["name"],
       "properties": {
         "name": {
+          "type": "string"
+        }
+      }
+    },
+    "chargeExperienceParams": {
+      "required": ["experienceID", "payment_type", "amount"],
+      "properties": {
+        "experienceID": {
+          "type": "string"
+        },
+        "payment_type": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "integer"
+        }
+      }
+    },
+    "addPaymentCardParams": {
+      "required": ["cardExpiryDate", "cardNumber", "cardCVV", "cardFullName"],
+      "properties": {
+        "cardExpiryDate": {
+          "type": "string"
+        },
+        "cardNumber": {
+          "type": "string"
+        },
+        "cardCVV": {
+          "type": "integer"
+        },
+        "cardFullName": {
+          "type": "integer"
+        }
+      }
+    },
+    "saveTransactionsParams": {
+      "required": ["experienceID", "id"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "experienceID": {
+          "type": "string"
+        }
+      }
+    },
+    "deletePaymentMethodParams": {
+      "required": ["payment_method_id"],
+      "properties": {
+        "payment_method_id": {
           "type": "string"
         }
       }

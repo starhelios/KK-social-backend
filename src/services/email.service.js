@@ -39,7 +39,6 @@ const sendPurchaseConfirmationEmail = async (to, experience_name, host_name) => 
   Regards,
 
   KloutKast Team`;
-  console.log('email sent');
   await sendEmail(to, subject, text);
 };
 
