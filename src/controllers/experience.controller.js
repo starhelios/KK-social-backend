@@ -16,7 +16,6 @@ const createExperience = catchAsync(async (req, res) => {
 });
 
 const getAll = catchAsync(async (req, res) => {
-  // console.log(req.query);
   const result = await experienceService.getAll(req.query);
 
   res.status(httpStatus.OK).send(generateResponse(true, result));
@@ -24,7 +23,6 @@ const getAll = catchAsync(async (req, res) => {
 
 const filterExperience = catchAsync(async (req, res) => {
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
-  console.log(req.body);
 
   const query = {};
 
@@ -53,14 +51,12 @@ const filterExperience = catchAsync(async (req, res) => {
 });
 
 const getExperience = catchAsync(async (req, res) => {
-  console.log(req.user);
   const experience = await experienceService.getExperienceById(req.params.id);
   if (!experience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
 
   const user = await userService.getUserById(experience.userId);
-  experience.userId = user;
 
   if (user) {
     res.send(generateResponse(true, { experience }));
