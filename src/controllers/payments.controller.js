@@ -6,8 +6,8 @@ const { paymentService } = require('../services');
 const { generateResponse } = require('../utils/utils');
 
 const generateAccountLink = catchAsync(async (req, res) => {
-  const userID = req.user._id;
-  const stripeAccountLink = await paymentService.generateStripeConnectAccountLink(userID);
+  console.log(req.params.userId);
+  const stripeAccountLink = await paymentService.generateStripeConnectAccountLink(req.params.userId, 'test2');
 
   // if (!user) {
   //   throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -16,8 +16,8 @@ const generateAccountLink = catchAsync(async (req, res) => {
 });
 
 const chargeCustomer = catchAsync(async (req, res) => {
-  const userID = req.user._id;
-  const chargeCustomerForExperience = await paymentService.chargeCustomerForExperience(req.body, userID);
+  console.log(req.params.userId);
+  const chargeCustomerForExperience = await paymentService.chargeCustomerForExperience(req.body);
 
   // if (!user) {
   //   throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -26,8 +26,7 @@ const chargeCustomer = catchAsync(async (req, res) => {
 });
 
 const savePaymentMethod = catchAsync(async (req, res) => {
-  const userID = req.user._id;
-  const savePaymentMethodForCustomer = await paymentService.createCustomerForPlatformAccount(req.body, userID);
+  const savePaymentMethodForCustomer = await paymentService.createCustomerForPlatformAccount(req.body);
 
   // if (!user) {
   //   throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -36,8 +35,7 @@ const savePaymentMethod = catchAsync(async (req, res) => {
 });
 
 const savePaymentTransactionInDB = catchAsync(async (req, res) => {
-  const userID = req.user._id;
-  const saveTransactionInDB = await paymentService.saveTransactionInDB(req.body, userID);
+  const saveTransactionInDB = await paymentService.saveTransactionInDB(req.body);
 
   // if (!user) {
   //   throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -46,8 +44,7 @@ const savePaymentTransactionInDB = catchAsync(async (req, res) => {
 });
 
 const deletePaymentMethod = catchAsync(async (req, res) => {
-  const userID = req.user._id;
-  const deletePaymentMethodRes = await paymentService.deleteCustomerPaymentMethod(req.body, userID);
+  const deletePaymentMethodRes = await paymentService.deleteCustomerPaymentMethod(req.body);
 
   // if (!user) {
   //   throw new ApiError(httpStatus.NOT_FOUND, 'User not found');

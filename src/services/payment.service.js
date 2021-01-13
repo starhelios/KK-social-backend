@@ -6,12 +6,13 @@ const { sendPurchaseConfirmationEmail } = require('./email.service');
 const ApiError = require('../utils/ApiError');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const deleteCustomerPaymentMethod = async (data, userID) => {
+const deleteCustomerPaymentMethod = async (data) => {
   try {
-    const user = await User.findById({ _id: userID });
+    const user = await User.findById({ _id: data.userID });
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
+    console.log(data);
     const userAvailableMethods = user.availableMethods;
     let filteredAvailableMethods = [];
     for (let i = 0; i < userAvailableMethods.length; i++) {
@@ -43,6 +44,7 @@ const createStripeConnectAccount = async (userId) => {
       },
       business_type: 'individual',
     });
+    console.log(account);
     return `${account.id}`;
   } catch (err) {
     console.log(err);
@@ -57,6 +59,7 @@ const generateStripeConnectAccountLink = async (userId) => {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
     if (!user.stripeConnectID) {
+      console.log("stripe connect account doesn't exist");
       const stripeConnectAccountID = await createStripeConnectAccount(user._id);
       user.stripeConnectID = stripeConnectAccountID;
       await user.save();
@@ -66,14 +69,19 @@ const generateStripeConnectAccountLink = async (userId) => {
         return_url: `${process.env.FRONT_END_APP_URL}/profile?type=success`,
         type: 'account_onboarding',
       });
+      console.log('accounts link');
+      console.log(accountLinks);
       return accountLinks.url;
     } else {
+      console.log('stripe connect account does exist');
       const accountLinks = await stripe.accountLinks.create({
         account: `${user.stripeConnectID}`,
         refresh_url: `${process.env.FRONT_END_APP_URL}/profile?type=refresh_url`,
         return_url: `${process.env.FRONT_END_APP_URL}/profile?type=success`,
         type: 'account_onboarding',
       });
+      console.log('accounts link');
+      console.log(accountLinks);
       return accountLinks.url;
     }
   } catch (err) {
@@ -82,10 +90,11 @@ const generateStripeConnectAccountLink = async (userId) => {
   }
 };
 
-const chargeCustomerForExperience = async (data, userID) => {
+const chargeCustomerForExperience = async (data) => {
   try {
+    console.log(data);
     // user = authenticated user trying to register
-    const user = await User.findById({ _id: userID });
+    const user = await User.findById({ _id: data.userID });
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
@@ -97,6 +106,7 @@ const chargeCustomerForExperience = async (data, userID) => {
     if (!findHostUser) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
+    console.log(user.stripeConnectID);
     if (data.payment_type === 'saved') {
       const paymentIntent = await stripe.paymentIntents.create({
         payment_method_types: ['card'],
@@ -109,6 +119,8 @@ const chargeCustomerForExperience = async (data, userID) => {
           destination: `${findHostUser.stripeConnectID}`,
         },
       });
+
+      console.log(paymentIntent);
       return paymentIntent.client_secret;
     } else {
       const paymentIntent = await stripe.paymentIntents.create({
@@ -120,6 +132,8 @@ const chargeCustomerForExperience = async (data, userID) => {
           destination: `${findHostUser.stripeConnectID}`,
         },
       });
+
+      console.log(paymentIntent);
       return paymentIntent.client_secret;
     }
   } catch (err) {
@@ -129,9 +143,11 @@ const chargeCustomerForExperience = async (data, userID) => {
 };
 
 //Get all payments from stripe and save in DB
-const saveTransactionInDB = async (data, userID) => {
+const saveTransactionInDB = async (data) => {
   try {
+    console.log(data);
     const getPaymentIntent = await await stripe.paymentIntents.retrieve(`${data.id}`);
+    console.log(getPaymentIntent);
     const newTransaction = new Transaction();
     newTransaction.stripeRawData = getPaymentIntent;
     newTransaction.total_amount_charged = getPaymentIntent.amount_received;
@@ -151,7 +167,7 @@ const saveTransactionInDB = async (data, userID) => {
     }
 
     const findPurchaseUser = await User.findOne({
-      _id: userID,
+      _id: data.userID,
     });
     if (!findPurchaseUser) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Purchase User not found.');
@@ -165,7 +181,7 @@ const saveTransactionInDB = async (data, userID) => {
     }
 
     newTransaction.hostUserID = findHostUser._id;
-    newTransaction.purchaseUserID = `${userID}`;
+    newTransaction.purchaseUserID = `${data.userID}`;
     await newTransaction.save();
     sendPurchaseConfirmationEmail(findPurchaseUser.email, findExperience.title, findHostUser.fullname);
     return 'OK';
@@ -175,14 +191,16 @@ const saveTransactionInDB = async (data, userID) => {
   }
 };
 
-const createCustomerForPlatformAccount = async (data, userID) => {
+const createCustomerForPlatformAccount = async (data) => {
   try {
-    const user = await User.findOne({ _id: userID });
+    const user = await User.findById({ _id: data.userID });
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
+    console.log(data);
     let splitMonthAndYear = data.data.cardExpiryDate;
     splitMonthAndYear = splitMonthAndYear.split(' ');
+    console.log(splitMonthAndYear);
     const expiryDate = parseInt(splitMonthAndYear[0]);
     const expiryYear = parseInt(splitMonthAndYear[1]);
     let isItFirstPaymentMethod = false;
@@ -196,6 +214,8 @@ const createCustomerForPlatformAccount = async (data, userID) => {
       },
     });
 
+    console.log(paymentMethod);
+
     // create stripe customer object if it doesn't exist in database
     if (!user.stripeCustomerID) {
       isItFirstPaymentMethod = true;
@@ -205,6 +225,8 @@ const createCustomerForPlatformAccount = async (data, userID) => {
         payment_method: paymentMethod.id,
       });
       user.stripeCustomerID = customer.id;
+
+      console.log(customer);
     }
     if (!isItFirstPaymentMethod) {
       /**
@@ -213,6 +235,7 @@ const createCustomerForPlatformAccount = async (data, userID) => {
       const paymentMethodAttach = await stripe.paymentMethods.attach(`${paymentMethod.id}`, {
         customer: `${user.stripeCustomerID}`,
       });
+      console.log(paymentMethodAttach);
     }
     //save payment method ids in db.
     const currentUserPaymentMethods = user.availableMethods;

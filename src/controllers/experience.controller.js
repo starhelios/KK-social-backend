@@ -53,14 +53,12 @@ const filterExperience = catchAsync(async (req, res) => {
 });
 
 const getExperience = catchAsync(async (req, res) => {
-  console.log(req.user);
   const experience = await experienceService.getExperienceById(req.params.id);
   if (!experience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
 
   const user = await userService.getUserById(experience.userId);
-  experience.userId = user;
 
   if (user) {
     res.send(generateResponse(true, { experience }));
