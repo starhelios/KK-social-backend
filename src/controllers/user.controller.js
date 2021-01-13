@@ -43,6 +43,7 @@ const getUser = catchAsync(async (req, res) => {
 });
 
 const getHost = catchAsync(async (req, res) => {
+  // const userID = req.user._id;
   const user = await userService.getUserById(req.params.userId);
 
   if (!user) {
@@ -81,7 +82,8 @@ const updateUser = catchAsync(async (req, res) => {
 });
 
 const deleteUser = catchAsync(async (req, res) => {
-  await userService.deleteUserById(req.params.userId);
+  const userID = req.user._id;
+  await userService.deleteUserById(userID);
   res.status(httpStatus.NO_CONTENT).send();
 });
 

@@ -16,7 +16,6 @@ const createExperience = catchAsync(async (req, res) => {
 });
 
 const getAll = catchAsync(async (req, res) => {
-  // console.log(req.query);
   const result = await experienceService.getAll(req.query);
 
   res.status(httpStatus.OK).send(generateResponse(true, result));
@@ -24,7 +23,6 @@ const getAll = catchAsync(async (req, res) => {
 
 const filterExperience = catchAsync(async (req, res) => {
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
-  console.log(req.body);
 
   const query = {};
 
