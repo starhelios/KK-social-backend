@@ -7,6 +7,7 @@ const experienceRoute = require('./experience.route');
 const hostRoute = require('./host.route');
 const paymentsRoute = require('./payments.route');
 const tutorialRoute = require('./tutorial.route');
+const searchRoute = require('./search.route');
 
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.use('/experiences', experienceRoute);
 router.use('/hosts', hostRoute);
 router.use('/payments', paymentsRoute);
 router.use('/tutorials', tutorialRoute);
+router.use('/search', searchRoute);
 
 module.exports = router;
