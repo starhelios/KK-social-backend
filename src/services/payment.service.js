@@ -84,16 +84,15 @@ const generateStripeConnectAccountLink = async (userId) => {
 
 const chargeCustomerForExperience = async (data, userID) => {
   try {
-    // user = authenticated user trying to register
-    const user = await User.findById({ _id: userID });
+    const user = await User.findOne({ _id: userID });
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
-    const findExperience = await Experience.findById({ _id: data.experienceID });
+    const findExperience = await Experience.findOne({ _id: data.experienceID });
     if (!findExperience) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
     }
-    const findHostUser = await User.findById({ _id: findExperience.userId });
+    const findHostUser = await User.findOne({ _id: findExperience.userId });
     if (!findHostUser) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }

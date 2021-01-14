@@ -39,7 +39,6 @@ const getExperienceById = async (id) => {
   if (!findHostInfo) {
     throw new ApiError(httpStatus.NOT_FOUND, 'USER not found');
   }
-  console.log(findHostInfo);
   const {
     _id,
     images,
@@ -56,6 +55,7 @@ const getExperienceById = async (id) => {
     updatedAt,
   } = findExperience;
   const responseData = {
+    id: _id,
     _id,
     images,
     title,
@@ -74,7 +74,6 @@ const getExperienceById = async (id) => {
       email: findHostInfo.email,
     },
   };
-  console.log(responseData);
   return responseData;
 };
 
