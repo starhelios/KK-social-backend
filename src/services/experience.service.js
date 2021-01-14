@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const moment = require('moment');
-const { Experience } = require('../models');
+const { Experience, User } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 const getExperienceByName = async (name) => {
@@ -29,7 +29,53 @@ const getAll = async (query) => {
 };
 
 const getExperienceById = async (id) => {
-  return Experience.findById(id);
+  const findExperience = await Experience.findOne({ _id: id });
+  if (!findExperience) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
+  }
+  const findHostInfo = await User.findOne({
+    _id: findExperience.userId,
+  });
+  if (!findHostInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'USER not found');
+  }
+  console.log(findHostInfo);
+  const {
+    _id,
+    images,
+    title,
+    description,
+    duration,
+    price,
+    categoryName,
+    dateAvaibility,
+    startDay,
+    endDay,
+    userId,
+    createAt,
+    updatedAt,
+  } = findExperience;
+  const responseData = {
+    _id,
+    images,
+    title,
+    description,
+    duration,
+    price,
+    categoryName,
+    dateAvaibility,
+    startDay,
+    endDay,
+    userId,
+    createAt,
+    updatedAt,
+    hostData: {
+      fullname: findHostInfo.fullname,
+      email: findHostInfo.email,
+    },
+  };
+  console.log(responseData);
+  return responseData;
 };
 
 const updateExperienceById = async (categoryId, updateBody) => {
