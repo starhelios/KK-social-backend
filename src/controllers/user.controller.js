@@ -87,16 +87,6 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const uploadAvatar = catchAsync(async (req, res) => {
-  const avatar = req.files.avatar;
-  const fileName = `${req.params.userId}.${mimeMatch[avatar.mimetype]}`;
-  avatar.mv(`${storagePath}/${fileName}`);
-  const avatarUrl = `http://${req.get('host')}/avatar/${fileName}`;
-  const user = await userService.updateUserById(req.params.userId, { avatarUrl });
-
-  res.send(generateResponse(true, user, 'Upload avatar successed!'));
-});
-
 const addCard = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
   user.paymentInfo.push(req.body);
@@ -137,7 +127,6 @@ module.exports = {
   deleteUser,
   getHosts,
   getHost,
-  uploadAvatar,
   addCard,
   deleteCard,
   addBank,
