@@ -70,11 +70,6 @@ const updateUser = catchAsync(async (req, res) => {
     const avatarUrl = `http://${req.get('host')}/avatar/${fileName}`;
     reqBody = { ...req.body, avatarUrl };
   }
-  // if (req.body.categoryName) {
-  //   const newCategoryName = req.body.categoryName.toLowerCase();
-  //   const categories = await Category.find({ name: newCategoryName }, { name: 1 }).exec();
-  //   if (categories.length === 0) await categoryService.createCategory({ name: newCategoryName });
-  // }
 
   const user = await userService.updateUserById(req.params.userId, reqBody);
 

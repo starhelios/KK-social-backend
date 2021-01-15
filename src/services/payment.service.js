@@ -123,7 +123,7 @@ const chargeCustomerForExperience = async (data, userID) => {
     }
   } catch (err) {
     console.log(err);
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Something went wrong while generating Intent.');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Payment method failed.');
   }
 };
 
