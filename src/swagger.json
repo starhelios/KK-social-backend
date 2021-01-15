@@ -482,7 +482,7 @@
         }
       }
     },
-    "/card/{userId}": {
+    "/users/card/{userId}": {
       "parameters": [
         {
           "name": "userId",
@@ -521,7 +521,7 @@
         }
       }
     },
-    "/card/{userId}/{cardId}": {
+    "/users/card/{userId}/{cardId}": {
       "parameters": [
         {
           "name": "userId",
@@ -1184,13 +1184,16 @@
     },
     "AddCard": {
       "properties": {
-        "stripeCustomerID": {
-          "type": "string"
-        },
         "cardType": {
           "type": "string"
         },
         "cardNumber": {
+          "type": "string"
+        },
+        "cardExpiryDate": {
+          "type": "string"
+        },
+        "cvc": {
           "type": "string"
         }
       }

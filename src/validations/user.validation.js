@@ -72,9 +72,10 @@ const addCard = {
     userId: Joi.required().custom(objectId),
   }),
   body: Joi.object().keys({
-    stripeCustomerID: Joi.string().required(),
     cardType: Joi.string().required(),
     cardNumber: Joi.string().required(),
+    cardExpiryDate: Joi.string().required(),
+    cvc: Joi.string().required(),
   }),
 };
 
