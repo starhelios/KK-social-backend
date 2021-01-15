@@ -4,15 +4,19 @@ const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 
 const paymentInfo = mongoose.Schema({
-  stripeCustomerID: {
-    type: String,
-    required: true,
-  },
   cardType: {
     type: String,
     required: true,
   },
   cardNumber: {
+    type: String,
+    required: true,
+  },
+  cardExpiryDate: {
+    type: String,
+    required: true,
+  },
+  cvc: {
     type: String,
     required: true,
   },

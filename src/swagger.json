@@ -443,46 +443,7 @@
         }
       }
     },
-    "/upload-avatar/{userId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "description": "ID of user that we want to find",
-          "type": "string"
-        }
-      ],
-      "patch": {
-        "tags": ["Users"],
-        "summary": "Upload a avatar file",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Authorization",
-            "description": "JWT token",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "avatar",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/UserAvatar"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "Unexpected error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
-      }
-    },
-    "/card/{userId}": {
+    "/users/card/{userId}": {
       "parameters": [
         {
           "name": "userId",
@@ -521,7 +482,7 @@
         }
       }
     },
-    "/card/{userId}/{cardId}": {
+    "/users/card/{userId}/{cardId}": {
       "parameters": [
         {
           "name": "userId",
@@ -1184,13 +1145,16 @@
     },
     "AddCard": {
       "properties": {
-        "stripeCustomerID": {
-          "type": "string"
-        },
         "cardType": {
           "type": "string"
         },
         "cardNumber": {
+          "type": "string"
+        },
+        "cardExpiryDate": {
+          "type": "string"
+        },
+        "cvc": {
           "type": "string"
         }
       }
