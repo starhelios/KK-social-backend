@@ -7,7 +7,7 @@ const search = catchAsync(async (req, res) => {
   const { keyword, location } = req.body;
 
   const userQuery = {
-    $or: [{ fullname: { $regex: `.*${keyword}.*` } }, { aboutMe: { $regex: `.*${keyword}.*` } }],
+    $or: [{ fullname: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }, { aboutMe: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }],
     isHost: true,
   };
 
