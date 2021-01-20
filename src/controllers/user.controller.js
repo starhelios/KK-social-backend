@@ -19,7 +19,7 @@ const mimeMatch = {
   'image/jpeg': 'jpg',
 };
 
-const storagePath = `${__dirname}/../../public/avatar`;
+// const storagePath = `${__dirname}/../../public/avatar`;
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -62,6 +62,7 @@ const getHosts = catchAsync(async (req, res) => {
 });
 
 const updateUser = catchAsync(async (req, res) => {
+  /*
   let reqBody = req.body;
   if (req.files && req.files.avatar) {
     const avatar = req.files.avatar;
@@ -77,6 +78,15 @@ const updateUser = catchAsync(async (req, res) => {
   }
 
   const user = await userService.updateUserById(req.params.userId, reqBody);
+*/
+
+  if (req.body.categoryName) {
+    const newCategoryName = req.body.categoryName.toLowerCase();
+    const categories = await Category.find({ name: newCategoryName }, { name: 1 }).exec();
+    if (categories.length === 0) await categoryService.createCategory({ name: newCategoryName });
+  }
+
+  const user = await userService.updateUserById(req.params.userId, req.body);
 
   res.send(generateResponse(true, user, 'Change user info successed!'));
 });
