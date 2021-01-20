@@ -25,9 +25,10 @@ const search = catchAsync(async (req, res) => {
   }
 
   if (startDay && endDay) {
-    query.startDay = { $gte: startDay };
-    // query.endDay = { $lte: endDay };
+    query.startDay = { $lte: startDay };
+    query.endDay = { $gte: endDay };
   }
+  
   if (minPrice && maxPrice) {
     query.price = { $gte: minPrice, $lte: maxPrice };
   }
@@ -41,7 +42,8 @@ const search = catchAsync(async (req, res) => {
     return eDay >= today;
   });
 
-  res.send(generateResponse(true, { hosts: users, experiences }));
+  // res.send(generateResponse(true, { hosts: users, experiences }));
+  res.send(generateResponse(true, { experiences }));
 });
 
 module.exports = {
