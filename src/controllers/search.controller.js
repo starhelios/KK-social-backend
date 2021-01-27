@@ -42,8 +42,7 @@ const search = catchAsync(async (req, res) => {
     return eDay >= today;
   });
 
-  // res.send(generateResponse(true, { hosts: users, experiences }));
-  res.send(generateResponse(true, { experiences }));
+  res.send(generateResponse(true, { hosts: users, experiences }));
 });
 
 module.exports = {
