@@ -106,6 +106,7 @@ const userSchema = mongoose.Schema(
     location: {
       type: String,
     },
+    ratingsGiven: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Ratings' }],
     paymentInfo: [paymentInfo],
     bankInfo: [bankInfo],
   },

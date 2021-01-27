@@ -45,6 +45,8 @@ const experienceSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    usersGoing: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User' }],
+    ratings: [{ type: mongoose.SchemaTypes.experience, ref: 'Rating' }],
     startDay: {
       type: Date,
       required: true,
