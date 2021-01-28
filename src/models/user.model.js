@@ -33,6 +33,21 @@ const bankInfo = mongoose.Schema({
   },
 });
 
+const bookingInfo = mongoose.Schema({
+  experienceID: {
+    type: String,
+    required: true,
+  },
+  dateAvaibilityID: {
+    type: String,
+    required: true,
+  },
+  completed: {
+    type: Boolean,
+    required: false,
+  },
+});
+
 const userSchema = mongoose.Schema(
   {
     fullname: {
@@ -110,6 +125,7 @@ const userSchema = mongoose.Schema(
     ratingsGiven: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Ratings' }],
     paymentInfo: [paymentInfo],
     bankInfo: [bankInfo],
+    bookingInfo: [bookingInfo],
   },
   {
     timestamps: true,

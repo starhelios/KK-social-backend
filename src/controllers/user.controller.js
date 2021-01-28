@@ -124,6 +124,22 @@ const deleteBank = catchAsync(async (req, res) => {
   res.send(generateResponse(true, user, 'Delete Bank successed!'));
 });
 
+const reservationBooking = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bookingInfo.push(req.body);
+  user.save();
+
+  res.send(generateResponse(true, user, 'Add Booking successed!'));
+});
+
+const joinBooking = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bookingInfo.id(req.params.id).completed = true;
+  user.save();
+
+  res.send(generateResponse(true, user, 'Update Booking successed!'));
+});
+
 module.exports = {
   createUser,
   getUsers,
@@ -136,4 +152,6 @@ module.exports = {
   deleteCard,
   addBank,
   deleteBank,
+  reservationBooking,
+  joinBooking,
 };
