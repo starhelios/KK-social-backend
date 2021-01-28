@@ -33,6 +33,21 @@ const bankInfo = mongoose.Schema({
   },
 });
 
+const bookingInfo = mongoose.Schema({
+  experienceID: {
+    type: String,
+    required: true,
+  },
+  dateAvaibilityID: {
+    type: String,
+    required: true,
+  },
+  completed: {
+    type: Boolean,
+    required: false,
+  },
+});
+
 const userSchema = mongoose.Schema(
   {
     fullname: {
@@ -108,6 +123,7 @@ const userSchema = mongoose.Schema(
     },
     paymentInfo: [paymentInfo],
     bankInfo: [bankInfo],
+    bookingInfo: [bookingInfo],
   },
   {
     timestamps: true,

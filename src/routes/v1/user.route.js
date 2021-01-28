@@ -34,4 +34,8 @@ router
   .route('/bank/:userId/:id')
   .delete(auth('manageUsers'), validate(userValidation.removeBank), userController.deleteBank);
 
+router.route('/booking/reservation/:userId').post(auth('manageUsers'), validate(userValidation.reservationBooking), userController.reservationBooking);
+router.route('/booking/join/:userId/:id').post(auth('manageUsers'), validate(userValidation.joinBooking), userController.joinBooking);
+
+
 module.exports = router;

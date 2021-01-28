@@ -103,6 +103,24 @@ const removeBank = {
   }),
 };
 
+const reservationBooking = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    experienceID: Joi.string().required(),
+    dateAvaibilityID: Joi.string().required(),
+    completed: Joi.boolean(),
+  }),
+};
+
+const joinBooking = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+    id: Joi.required().custom(objectId),
+  }),
+};
+
 module.exports = {
   createUser,
   getUsers,
@@ -115,4 +133,6 @@ module.exports = {
   addBank,
   removeCard,
   removeBank,
+  reservationBooking,
+  joinBooking,
 };
