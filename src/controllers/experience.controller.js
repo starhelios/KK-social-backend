@@ -21,6 +21,12 @@ const getAll = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(generateResponse(true, result));
 });
 
+const reserveExperience = catchAsync(async (req, res) => {
+  const result = await experienceService.reserveExperience(req.body);
+
+  res.status(httpStatus.OK).send(generateResponse(true, result));
+});
+
 const filterExperience = catchAsync(async (req, res) => {
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
 
@@ -79,6 +85,7 @@ const addDateAvaibility = catchAsync(async (req, res) => {
 
 const removeDateAvaibility = catchAsync(async (req, res) => {
   const experience = await experienceService.getExperienceById(req.params.id);
+  console.log(req.params.id);
   if (!experience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
@@ -95,4 +102,5 @@ module.exports = {
   getExperience,
   addDateAvaibility,
   removeDateAvaibility,
+  reserveExperience,
 };

@@ -11,6 +11,8 @@ router
   .post(auth(), validate(experienceValidation.createExperience), experienceController.createExperience)
   .get(validate({}), experienceController.getAll);
 
+router.route('/reserve').post(validate(experienceValidation.reserveExperience), experienceController.reserveExperience); //TODO Add auth() to this route.
+
 router.post('/filter', validate({}), experienceController.filterExperience);
 
 router.route('/:id').get(validate(experienceValidation.getById), experienceController.getExperience);
