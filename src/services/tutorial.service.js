@@ -10,7 +10,6 @@ const createTutorial = async (body) => {
 
 const getAll = async () => {
   const tutorials = await Tutorial.find({});
-
   return tutorials;
 };
 

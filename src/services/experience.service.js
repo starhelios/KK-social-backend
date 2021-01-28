@@ -16,6 +16,17 @@ const createExperience = async (experienceBody) => {
   return category;
 };
 
+const reserveExperience = async ({ userId, experienceId }) => {
+  const result = await Experience.findOne({ _id: experienceId });
+  if (result.usersGoing.indexOf(userId) > -1) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User is already going');
+  } else {
+    result.usersGoing.push(userId);
+    await result.save();
+  }
+  return result;
+};
+
 const getAll = async (query) => {
   const experiences = await Experience.find(query);
   const result = experiences.filter((item) => {
@@ -30,12 +41,14 @@ const getAll = async (query) => {
 
 const getExperienceById = async (id) => {
   const findExperience = await Experience.findOne({ _id: id });
+
   if (!findExperience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
   const findHostInfo = await User.findOne({
     _id: findExperience.userId,
   });
+
   if (!findHostInfo) {
     throw new ApiError(httpStatus.NOT_FOUND, 'USER not found');
   }
@@ -77,6 +90,10 @@ const getExperienceById = async (id) => {
   return responseData;
 };
 
+const getAllUserExperiences = async (id) => {
+  // const experiences = Experience.find({})
+};
+
 const updateExperienceById = async (categoryId, updateBody) => {
   const category = await getExperienceById(categoryId);
 
@@ -105,6 +122,7 @@ const deleteExperienceById = async (categoryId) => {
 module.exports = {
   getExperienceByName,
   createExperience,
+  reserveExperience,
   getAll,
   getExperienceById,
   updateExperienceById,
