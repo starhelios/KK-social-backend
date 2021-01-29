@@ -2,13 +2,17 @@ const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
 const ratingSchema = mongoose.Schema({
-  experience: {
+  specificExperience: {
     type: mongoose.SchemaTypes.ObjectId,
-    ref: 'Experience',
+    ref: 'Specific Experience',
     required: true,
   },
   rating: {
     type: Number,
+    required: true,
+  },
+  userId: {
+    type: String,
     required: true,
   },
 });

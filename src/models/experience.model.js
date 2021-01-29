@@ -46,7 +46,6 @@ const experienceSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    ratings: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Rating' }],
     startDay: {
       type: Date,
       required: true,

@@ -96,11 +96,19 @@ const addSpecificExperience = catchAsync(async (req, res) => {
 });
 
 const createSpecificExperience = catchAsync(async (req, res) => {
-  const experiencesCreated = await experienceService.createSpecificExperience(req.body);
+  const experiencesCreated = await experienceService.createSpecificExperience(req.body, req.params.id);
   if (!experiencesCreated) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No experiences created');
   }
   res.send(generateResponse(true, { experiencesCreated }));
+});
+
+const rateSpecificExperience = catchAsync(async (req, res) => {
+  const ratedExperience = await experienceService.rateSpecificExperience(req.body);
+  if (!ratedExperience) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No experiences rated');
+  }
+  res.send(generateResponse(true, { ratedExperience }));
 });
 
 const removeDateAvaibility = catchAsync(async (req, res) => {
@@ -118,6 +126,7 @@ const removeDateAvaibility = catchAsync(async (req, res) => {
 module.exports = {
   createExperience,
   createSpecificExperience,
+  rateSpecificExperience,
   getUserBookings,
   getAll,
   filterExperience,

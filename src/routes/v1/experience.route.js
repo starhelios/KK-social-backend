@@ -10,7 +10,8 @@ router
   .route('/')
   .post(auth(), validate(experienceValidation.createExperience), experienceController.createExperience)
   .get(validate({}), experienceController.getAll);
-router.route('/createSpecificExperience').post(experienceController.createSpecificExperience);
+router.route('/createSpecificExperience/:id').post(experienceController.createSpecificExperience);
+router.route('/rate').post(experienceController.rateSpecificExperience);
 
 router.route('/reserve').post(validate(experienceValidation.reserveExperience), experienceController.reserveExperience); //TODO Add auth() to this route.
 router.route('/reserved/:id').get(experienceController.getUserBookings);

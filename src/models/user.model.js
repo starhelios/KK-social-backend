@@ -122,7 +122,6 @@ const userSchema = mongoose.Schema(
       type: String,
     },
     experiences: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Experience' }],
-    ratingsGiven: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Ratings' }],
     paymentInfo: [paymentInfo],
     bankInfo: [bankInfo],
     bookingInfo: [bookingInfo],
