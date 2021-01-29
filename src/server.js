@@ -78,6 +78,7 @@ app.use(express.static(`${__dirname}/../public`));
 
 app.listen(port, () => {
   mongoose.connect(process.env.DATABASE, {
+    useFindAndModify: false,
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,

@@ -14,6 +14,7 @@ const dateAvaibility = mongoose.Schema({
     type: String,
     required: true,
   },
+  usersGoing: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User' }],
 });
 
 const experienceSchema = mongoose.Schema(
@@ -45,7 +46,6 @@ const experienceSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    usersGoing: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User' }],
     ratings: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Rating' }],
     startDay: {
       type: Date,
@@ -55,7 +55,7 @@ const experienceSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
-    dateAvaibility: [dateAvaibility],
+    specificExperience: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Specific Experience' }],
   },
   {
     timestamps: true,

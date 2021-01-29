@@ -6,3 +6,5 @@ module.exports.Experience = require('./experience.model');
 module.exports.Transaction = require('./transaction.model');
 module.exports.Tutorial = require('./tutorial.model');
 module.exports.Rating = require('./rating.model');
+module.exports.SpecificExperience = require('./specificExperience.model');
+module.exports.Reservation = require('./reservation.model');

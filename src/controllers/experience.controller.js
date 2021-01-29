@@ -58,6 +58,7 @@ const filterExperience = catchAsync(async (req, res) => {
 
 const getExperience = catchAsync(async (req, res) => {
   const experience = await experienceService.getExperienceById(req.params.id);
+  console.log(experience);
   if (!experience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
@@ -71,16 +72,35 @@ const getExperience = catchAsync(async (req, res) => {
   }
 });
 
-const addDateAvaibility = catchAsync(async (req, res) => {
+const getUserBookings = catchAsync(async (req, res) => {
+  const userBookings = await experienceService.getUserBookings(req.params.id);
+  if (!req.params.id) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User ID not found');
+  } else if (!userBookings) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User bookings not found');
+  } else {
+    res.send(generateResponse(true, { userBookings }));
+  }
+});
+
+const addSpecificExperience = catchAsync(async (req, res) => {
   const experience = await experienceService.getExperienceById(req.params.id);
   if (!experience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
 
-  req.body.items.forEach((item) => experience.dateAvaibility.push(item));
+  req.body.items.forEach((item) => experience.specificExperience.push(item));
   experience.save();
 
   res.send(generateResponse(true, { experience }));
+});
+
+const createSpecificExperience = catchAsync(async (req, res) => {
+  const experiencesCreated = await experienceService.createSpecificExperience(req.body);
+  if (!experiencesCreated) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No experiences created');
+  }
+  res.send(generateResponse(true, { experiencesCreated }));
 });
 
 const removeDateAvaibility = catchAsync(async (req, res) => {
@@ -97,10 +117,12 @@ const removeDateAvaibility = catchAsync(async (req, res) => {
 
 module.exports = {
   createExperience,
+  createSpecificExperience,
+  getUserBookings,
   getAll,
   filterExperience,
   getExperience,
-  addDateAvaibility,
+  addSpecificExperience,
   removeDateAvaibility,
   reserveExperience,
 };
