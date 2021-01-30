@@ -141,6 +141,9 @@ const saveTransactionInDB = async (data, userID) => {
     newTransaction.viewChargesURL = getPaymentIntent.charges.url;
     newTransaction.experienceID = `${data.experienceID}`;
 
+    console.log(getPaymentIntent);
+    console.log('-------');
+
     const findHostUser = await User.findOne({
       stripeConnectID: getPaymentIntent.transfer_data.destination,
     });

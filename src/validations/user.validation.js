@@ -67,25 +67,6 @@ const checkUserID = {
   }),
 };
 
-const addCard = {
-  params: Joi.object().keys({
-    userId: Joi.required().custom(objectId),
-  }),
-  body: Joi.object().keys({
-    cardType: Joi.string().required(),
-    cardNumber: Joi.string().required(),
-    cardExpiryDate: Joi.string().required(),
-    cvc: Joi.string().required(),
-  }),
-};
-
-const removeCard = {
-  params: Joi.object().keys({
-    userId: Joi.required().custom(objectId),
-    id: Joi.string().required(),
-  }),
-};
-
 const addBank = {
   params: Joi.object().keys({
     userId: Joi.required().custom(objectId),
@@ -129,9 +110,7 @@ module.exports = {
   deleteUser,
   getHosts,
   checkUserID,
-  addCard,
   addBank,
-  removeCard,
   removeBank,
   reservationBooking,
   joinBooking,

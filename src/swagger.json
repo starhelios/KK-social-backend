@@ -443,75 +443,6 @@
         }
       }
     },
-    "/users/card/{userId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "description": "ID of user that we want to find",
-          "type": "string"
-        }
-      ],
-      "post": {
-        "tags": ["Users"],
-        "summary": "Add a card to User",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Authorization",
-            "description": "JWT token",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "avatar",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/AddCard"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "Unexpected error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
-      }
-    },
-    "/users/card/{userId}/{cardId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "description": "ID of user that we want to find",
-          "type": "string"
-        },
-        {
-          "name": "cardId",
-          "in": "path",
-          "required": true,
-          "description": "ID of card that we want to delete",
-          "type": "string"
-        }
-      ],
-      "delete": {
-        "tags": ["Users"],
-        "summary": "Delete a card from User",
-        "responses": {
-          "default": {
-            "description": "Unexpected error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
-      }
-    },
     "/bank/{userId}": {
       "parameters": [
         {
@@ -1140,22 +1071,6 @@
       "properties": {
         "avatar": {
           "type": "file"
-        }
-      }
-    },
-    "AddCard": {
-      "properties": {
-        "cardType": {
-          "type": "string"
-        },
-        "cardNumber": {
-          "type": "string"
-        },
-        "cardExpiryDate": {
-          "type": "string"
-        },
-        "cvc": {
-          "type": "string"
         }
       }
     },

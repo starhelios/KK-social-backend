@@ -92,22 +92,6 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const addCard = catchAsync(async (req, res) => {
-  const user = await userService.getUserById(req.params.userId);
-  user.paymentInfo.push(req.body);
-  user.save();
-
-  res.send(generateResponse(true, user, 'Add Card successed!'));
-});
-
-const deleteCard = catchAsync(async (req, res) => {
-  const user = await userService.getUserById(req.params.userId);
-  user.paymentInfo.id(req.params.id).remove();
-  user.save();
-
-  res.send(generateResponse(true, user, 'Delete Card successed!'));
-});
-
 const addBank = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
   user.bankInfo.push(req.body);
@@ -148,8 +132,6 @@ module.exports = {
   deleteUser,
   getHosts,
   getHost,
-  addCard,
-  deleteCard,
   addBank,
   deleteBank,
   reservationBooking,
