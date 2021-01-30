@@ -24,11 +24,6 @@ router
   .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
-router.route('/card/:userId').post(auth('manageUsers'), validate(userValidation.addCard), userController.addCard);
-router
-  .route('/card/:userId/:id')
-  .delete(auth('manageUsers'), validate(userValidation.removeCard), userController.deleteCard);
-
 router.route('/bank/:userId').post(auth('manageUsers'), validate(userValidation.addBank), userController.addBank);
 router
   .route('/bank/:userId/:id')
