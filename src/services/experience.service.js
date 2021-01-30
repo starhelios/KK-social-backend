@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const moment = require('moment');
-const { Experience } = require('../models');
+const { Experience, User, SpecificExperience, Reservation, Rating } = require('../models');
+const { populate } = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
 
 const getExperienceByName = async (name) => {
@@ -16,6 +17,59 @@ const createExperience = async (experienceBody) => {
   return category;
 };
 
+const createSpecificExperience = async (experienceBody, id) => {
+  console.log(experienceBody);
+  const createExperiences = await SpecificExperience.create(experienceBody.specificExperiences);
+  const experienceId = id;
+  const experienceIds = createExperiences.map((item, idx) => {
+    return item._id;
+  });
+  const pushedExperience = await Experience.findByIdAndUpdate(
+    { _id: experienceId },
+    { $push: { specificExperience: experienceIds } }
+  );
+  return pushedExperience;
+};
+
+const rateSpecificExperience = async (data) => {
+  const { experienceId, rating, userId } = data;
+  const obj = {
+    specificExperience: experienceId,
+    rating,
+    userId,
+  };
+  const alreadyRatedExperience = await Rating.findOne({ specificExperience: experienceId, userId: userId });
+  if (!alreadyRatedExperience) {
+    const rateExperience = await Rating.create(obj);
+    const pushToSpecificExperience = await SpecificExperience.findByIdAndUpdate(
+      { _id: experienceId },
+      { $push: { ratings: rateExperience._id } }
+    );
+    console.log(pushToSpecificExperience);
+    return { rateExperience, pushToSpecificExperience };
+  } else {
+    console.log('running else');
+    const rateExperience = await Rating.findOneAndUpdate(
+      { specificExperience: experienceId, userId: userId },
+      { obj },
+      { upsert: true, new: true }
+    );
+    return rateExperience;
+  }
+};
+
+const reserveExperience = async (data) => {
+  const { id, paymentIntent, imageUrl, guests, userId } = data;
+  //TODO charge card
+  const specificExp = await SpecificExperience.findOneAndUpdate(
+    { _id: id },
+    { $push: { usersGoing: userId }, imageUrl: imageUrl },
+    { upsert: true, new: true }
+  );
+  const reservation = await Reservation.create({ specificExperience: specificExp._id, numberOfGuests: guests });
+  return { ...specificExp, ...reservation };
+};
+
 const getAll = async (query) => {
   const experiences = await Experience.find(query);
   const result = experiences.filter((item) => {
@@ -29,7 +83,75 @@ const getAll = async (query) => {
 };
 
 const getExperienceById = async (id) => {
-  return Experience.findById(id);
+  const findExperience = await Experience.findOne({ _id: id }).populate('specificExperience').exec();
+
+  if (!findExperience) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
+  }
+  const findHostInfo = await User.findOne({
+    _id: findExperience.userId,
+  });
+
+  if (!findHostInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'USER not found');
+  }
+  const {
+    _id,
+    images,
+    title,
+    description,
+    duration,
+    price,
+    categoryName,
+    specificExperience,
+    startDay,
+    endDay,
+    userId,
+    createAt,
+    updatedAt,
+  } = findExperience;
+  const responseData = {
+    id: _id,
+    _id,
+    images,
+    title,
+    description,
+    duration,
+    price,
+    categoryName,
+    specificExperience,
+    startDay,
+    endDay,
+    userId,
+    createAt,
+    updatedAt,
+    hostData: {
+      fullname: findHostInfo.fullname,
+      email: findHostInfo.email,
+    },
+  };
+  return responseData;
+};
+
+const getUserBookings = async (id) => {
+  const populateQuery = [
+    {
+      path: 'experience',
+      populate: {
+        path: 'specificExperience',
+        model: 'Specific Experience',
+      },
+    },
+    {
+      path: 'ratings',
+    },
+  ];
+  const userBookings = await SpecificExperience.find({ usersGoing: id }).populate(populateQuery).exec();
+  console.log(userBookings);
+  if (!userBookings) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Bookings not found');
+  }
+  return userBookings;
 };
 
 const updateExperienceById = async (categoryId, updateBody) => {
@@ -60,6 +182,10 @@ const deleteExperienceById = async (categoryId) => {
 module.exports = {
   getExperienceByName,
   createExperience,
+  createSpecificExperience,
+  rateSpecificExperience,
+  reserveExperience,
+  getUserBookings,
   getAll,
   getExperienceById,
   updateExperienceById,

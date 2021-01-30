@@ -121,6 +121,7 @@ const userSchema = mongoose.Schema(
     location: {
       type: String,
     },
+    experiences: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Experience' }],
     paymentInfo: [paymentInfo],
     bankInfo: [bankInfo],
     bookingInfo: [bookingInfo],

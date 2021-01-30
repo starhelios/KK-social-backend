@@ -28,7 +28,14 @@ const getById = {
   }),
 };
 
-const addDateAvaibility = {
+const reserveExperience = {
+  body: Joi.object().keys({
+    userId: Joi.string(),
+    experienceId: Joi.string(),
+  }),
+};
+
+const addSpecificExperience = {
   params: Joi.object().keys({
     id: Joi.string().custom(objectId),
   }),
@@ -52,6 +59,7 @@ module.exports = {
   createExperience,
   getAll,
   getById,
-  addDateAvaibility,
+  addSpecificExperience,
   removeDateAvaibility,
+  reserveExperience,
 };

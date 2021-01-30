@@ -21,6 +21,12 @@ const getAll = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(generateResponse(true, result));
 });
 
+const reserveExperience = catchAsync(async (req, res) => {
+  const result = await experienceService.reserveExperience(req.body);
+
+  res.status(httpStatus.OK).send(generateResponse(true, result));
+});
+
 const filterExperience = catchAsync(async (req, res) => {
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
 
@@ -52,6 +58,7 @@ const filterExperience = catchAsync(async (req, res) => {
 
 const getExperience = catchAsync(async (req, res) => {
   const experience = await experienceService.getExperienceById(req.params.id);
+  console.log(experience);
   if (!experience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
@@ -65,20 +72,48 @@ const getExperience = catchAsync(async (req, res) => {
   }
 });
 
-const addDateAvaibility = catchAsync(async (req, res) => {
+const getUserBookings = catchAsync(async (req, res) => {
+  const userBookings = await experienceService.getUserBookings(req.params.id);
+  if (!req.params.id) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User ID not found');
+  } else if (!userBookings) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User bookings not found');
+  } else {
+    res.send(generateResponse(true, { userBookings }));
+  }
+});
+
+const addSpecificExperience = catchAsync(async (req, res) => {
   const experience = await experienceService.getExperienceById(req.params.id);
   if (!experience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
 
-  req.body.items.forEach((item) => experience.dateAvaibility.push(item));
+  req.body.items.forEach((item) => experience.specificExperience.push(item));
   experience.save();
 
   res.send(generateResponse(true, { experience }));
 });
 
+const createSpecificExperience = catchAsync(async (req, res) => {
+  const experiencesCreated = await experienceService.createSpecificExperience(req.body, req.params.id);
+  if (!experiencesCreated) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No experiences created');
+  }
+  res.send(generateResponse(true, { experiencesCreated }));
+});
+
+const rateSpecificExperience = catchAsync(async (req, res) => {
+  const ratedExperience = await experienceService.rateSpecificExperience(req.body);
+  if (!ratedExperience) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No experiences rated');
+  }
+  res.send(generateResponse(true, { ratedExperience }));
+});
+
 const removeDateAvaibility = catchAsync(async (req, res) => {
   const experience = await experienceService.getExperienceById(req.params.id);
+  console.log(req.params.id);
   if (!experience) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
@@ -90,9 +125,13 @@ const removeDateAvaibility = catchAsync(async (req, res) => {
 
 module.exports = {
   createExperience,
+  createSpecificExperience,
+  rateSpecificExperience,
+  getUserBookings,
   getAll,
   filterExperience,
   getExperience,
-  addDateAvaibility,
+  addSpecificExperience,
   removeDateAvaibility,
+  reserveExperience,
 };

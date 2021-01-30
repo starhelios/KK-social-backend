@@ -14,6 +14,7 @@ const dateAvaibility = mongoose.Schema({
     type: String,
     required: true,
   },
+  usersGoing: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User' }],
 });
 
 const experienceSchema = mongoose.Schema(
@@ -53,7 +54,7 @@ const experienceSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
-    dateAvaibility: [dateAvaibility],
+    specificExperience: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Specific Experience' }],
   },
   {
     timestamps: true,

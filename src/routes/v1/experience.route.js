@@ -10,6 +10,11 @@ router
   .route('/')
   .post(auth(), validate(experienceValidation.createExperience), experienceController.createExperience)
   .get(validate({}), experienceController.getAll);
+router.route('/createSpecificExperience/:id').post(experienceController.createSpecificExperience);
+router.route('/rate').post(experienceController.rateSpecificExperience);
+
+router.route('/reserve').post(validate(experienceValidation.reserveExperience), experienceController.reserveExperience); //TODO Add auth() to this route.
+router.route('/reserved/:id').get(experienceController.getUserBookings);
 
 router.post('/filter', validate({}), experienceController.filterExperience);
 
@@ -17,7 +22,7 @@ router.route('/:id').get(validate(experienceValidation.getById), experienceContr
 
 router
   .route('/dates/:id')
-  .post(validate(experienceValidation.addDateAvaibility), experienceController.addDateAvaibility)
+  .post(validate(experienceValidation.addSpecificExperience), experienceController.addSpecificExperience)
   .delete(validate(experienceValidation.removeDateAvaibility), experienceController.removeDateAvaibility);
 
 module.exports = router;
