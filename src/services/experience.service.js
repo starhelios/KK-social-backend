@@ -18,17 +18,26 @@ const createExperience = async (experienceBody) => {
 };
 
 const createSpecificExperience = async (experienceBody, id) => {
-  console.log(experienceBody);
-  const createExperiences = await SpecificExperience.create(experienceBody.specificExperiences);
+  const { startTime, endTime } = experienceBody.specificExperiences;
+  const getExperience = await Experience.findOne({ _id: id });
   const experienceId = id;
-  const experienceIds = createExperiences.map((item, idx) => {
-    return item._id;
-  });
-  const pushedExperience = await Experience.findByIdAndUpdate(
-    { _id: experienceId },
-    { $push: { specificExperience: experienceIds } }
-  );
-  return pushedExperience;
+  for (i = 1; i <= 40; i++) {
+    let object = {
+      experience: experienceId,
+      day: moment(new Date(new Date().getTime() + 86400000 * i)).format('LL'),
+      startTime,
+      endTime,
+      imageUrl: getExperience.images[0],
+    };
+    const createdExperience = await SpecificExperience.create(object);
+    const pushedExperience = await Experience.findByIdAndUpdate(
+      { _id: experienceId },
+      { $push: { specificExperience: createdExperience._id } }
+    );
+    if (i === 40) {
+      return pushedExperience;
+    }
+  }
 };
 
 const rateSpecificExperience = async (data) => {
@@ -48,7 +57,6 @@ const rateSpecificExperience = async (data) => {
     console.log(pushToSpecificExperience);
     return { rateExperience, pushToSpecificExperience };
   } else {
-    console.log('running else');
     const rateExperience = await Rating.findOneAndUpdate(
       { specificExperience: experienceId, userId: userId },
       { obj },

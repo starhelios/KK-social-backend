@@ -633,6 +633,153 @@
         }
       }
     },
+    "/createSpecificExperience/{id}": {
+      "parameters": [{
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "ID of experiences we want to create",
+        "type": "string"
+      },
+      {
+        "name": "startTime",
+        "in": "body",
+        "required": true,
+        "description": "Starting time of experiences we want to create",
+        "type": "string"
+      },
+      {
+        "name": "endTime",
+        "in": "body",
+        "required": true,
+        "description": "Ending time of experiences we want to create",
+        "type": "string"
+      }
+    ],
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Create 40 entries of specific experiences for a given ID. For developer to create entries at ease.",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/rate": {
+      "parameters": [
+      {
+        "name": "experienceId",
+        "in": "body",
+        "required": true,
+        "description": "ID of the experience they want to rate",
+        "type": "string"
+      },
+      {
+        "name": "rating",
+        "in": "body",
+        "required": true,
+        "description": "Rating of the specific experience",
+        "type": "number"
+      },
+      {
+        "name": "userId",
+        "in": "body",
+        "required": true,
+        "description": "ID of current user rating experience",
+        "type": "string"
+      }
+    ],
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Rate the specific experience",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/reserve": {
+      "parameters": [
+      {
+        "name": "id",
+        "in": "body",
+        "required": true,
+        "description": "ID of the specific experience",
+        "type": "string"
+      },
+      {
+        "name": "paymentIntent",
+        "in": "body",
+        "required": true,
+        "description": "Payment Intent from Stripe front end charge method",
+        "type": "string"
+      },
+      {
+        "name": "imageUrl",
+        "in": "body",
+        "required": true,
+        "description": "Image URL of the specific experience",
+        "type": "string"
+      },
+      {
+        "name": "guests",
+        "in": "body",
+        "required": true,
+        "description": "Number of guests the user is looking to bring",
+        "type": "number"
+      },
+      {
+        "name": "userId",
+        "in": "body",
+        "required": true,
+        "description": "ID of current user reserving experience",
+        "type": "string"
+      }
+    ],
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Reserve a specific experience",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/reserved/{id}": {
+      "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "ID of the user",
+        "type": "string"
+      }
+    ],
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Grab all reserved experiences for a user",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/experiences/filter": {
       "post": {
         "tags": ["Experiences"],
