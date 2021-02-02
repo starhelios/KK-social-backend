@@ -38,7 +38,6 @@ const search = catchAsync(async (req, res) => {
   const experiences = catetories.filter((item) => {
     const today = new Date();
     const eDay = new Date(item.endDay);
-
     return eDay >= today;
   });
 
