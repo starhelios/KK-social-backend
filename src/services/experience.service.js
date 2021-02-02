@@ -9,26 +9,74 @@ const getExperienceByName = async (name) => {
 };
 
 const createExperience = async (experienceBody) => {
-  if (await Experience.isTitleTaken(experienceBody.title)) {
+  console.log(experienceBody);
+  const {
+    title,
+    description,
+    duration,
+    price,
+    images,
+    startDay,
+    endDay,
+    categoryName,
+    userId,
+    specificExperiences,
+  } = experienceBody;
+  const newExperience = {
+    title,
+    description,
+    duration,
+    price,
+    images,
+    startDay,
+    endDay,
+    categoryName,
+    userId,
+  };
+  if (await Experience.isTitleTaken(title)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Experience name already taken');
   }
-  const category = await Experience.create(experienceBody);
+  const savedExperience = await Experience.create(newExperience);
+  console.log(savedExperience);
+  specificExperiences.forEach((element) => {
+    element.imageUrl = savedExperience.images[0];
+    element.experience = savedExperience._id;
+  });
+  console.log(specificExperiences);
+  const savedSpecificExperiences = await SpecificExperience.insertMany(specificExperiences);
+  let experienceIds = savedSpecificExperiences.map((item, idx) => {
+    return item._id;
+  });
+  const pushToExperienceModel = await Experience.findByIdAndUpdate(
+    { _id: savedExperience._id },
+    { $push: { specificExperience: experienceIds } }
+  );
+  console.log(pushToExperienceModel);
 
-  return category;
+  return { savedExperience, savedSpecificExperiences, pushToExperienceModel };
 };
 
 const createSpecificExperience = async (experienceBody, id) => {
-  console.log(experienceBody);
-  const createExperiences = await SpecificExperience.create(experienceBody.specificExperiences);
+  const { startTime, endTime } = experienceBody.specificExperiences;
+  const getExperience = await Experience.findOne({ _id: id });
   const experienceId = id;
-  const experienceIds = createExperiences.map((item, idx) => {
-    return item._id;
-  });
-  const pushedExperience = await Experience.findByIdAndUpdate(
-    { _id: experienceId },
-    { $push: { specificExperience: experienceIds } }
-  );
-  return pushedExperience;
+  for (i = 1; i <= 40; i++) {
+    let object = {
+      experience: experienceId,
+      day: moment(new Date(new Date().getTime() + 86400000 * i)).format('LL'),
+      startTime,
+      endTime,
+      imageUrl: getExperience.images[0],
+    };
+    const createdExperience = await SpecificExperience.create(object);
+    const pushedExperience = await Experience.findByIdAndUpdate(
+      { _id: experienceId },
+      { $push: { specificExperience: createdExperience._id } }
+    );
+    if (i === 40) {
+      return pushedExperience;
+    }
+  }
 };
 
 const rateSpecificExperience = async (data) => {
@@ -48,7 +96,6 @@ const rateSpecificExperience = async (data) => {
     console.log(pushToSpecificExperience);
     return { rateExperience, pushToSpecificExperience };
   } else {
-    console.log('running else');
     const rateExperience = await Rating.findOneAndUpdate(
       { specificExperience: experienceId, userId: userId },
       { obj },
