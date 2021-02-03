@@ -28,7 +28,7 @@ const reserveExperience = catchAsync(async (req, res) => {
 });
 
 const filterExperience = catchAsync(async (req, res) => {
-  const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
+  const { categoryName, startDay, endDay, minPrice, maxPrice, location } = req.body;
 
   const query = {};
 
@@ -42,6 +42,9 @@ const filterExperience = catchAsync(async (req, res) => {
   }
   if (minPrice && maxPrice) {
     query.price = { $gte: minPrice, $lte: maxPrice };
+  }
+  if (location.length) {
+    query.location = location;
   }
 
   const catetories = await Experience.find(query).exec();

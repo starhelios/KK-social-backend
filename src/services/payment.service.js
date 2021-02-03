@@ -43,6 +43,7 @@ const createStripeConnectAccount = async (userId) => {
       },
       business_type: 'individual',
     });
+    console.log('creating stripe connect account');
     return `${account.id}`;
   } catch (err) {
     console.log(err);
@@ -83,6 +84,7 @@ const generateStripeConnectAccountLink = async (userId) => {
 };
 
 const chargeCustomerForExperience = async (data, userID) => {
+  console.log(data);
   try {
     const user = await User.findOne({ _id: userID });
     if (!user) {
@@ -96,6 +98,7 @@ const chargeCustomerForExperience = async (data, userID) => {
     if (!findHostUser) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
+    console.log('this is the data', data);
     if (data.payment_type === 'saved') {
       const paymentIntent = await stripe.paymentIntents.create({
         payment_method_types: ['card'],
@@ -114,6 +117,7 @@ const chargeCustomerForExperience = async (data, userID) => {
         payment_method_types: ['card'],
         amount: data.amount,
         currency: 'usd',
+        // payment_method: findHostUser.stripeCustomerID,
         application_fee_amount: data.amount * process.env.APP_FEE,
         transfer_data: {
           destination: `${findHostUser.stripeConnectID}`,
@@ -122,7 +126,7 @@ const chargeCustomerForExperience = async (data, userID) => {
       return paymentIntent.client_secret;
     }
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
     throw new ApiError(httpStatus.BAD_REQUEST, 'Payment method failed.');
   }
 };

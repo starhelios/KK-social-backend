@@ -26,6 +26,7 @@ const getUserById = async (id) => {
 };
 
 const updateUserById = async (userId, updateBody) => {
+  console.log('running');
   const user = await getUserById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
