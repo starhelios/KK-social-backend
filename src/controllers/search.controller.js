@@ -12,7 +12,7 @@ const search = catchAsync(async (req, res) => {
   };
 
   if (location.length > 0) {
-    userQuery.location = { $regex: `${location}` };
+    userQuery.location = { $regex: new RegExp(`.*${location}.*`, 'i') };
   }
   const users = await User.find(userQuery).exec();
 
@@ -38,7 +38,6 @@ const search = catchAsync(async (req, res) => {
   const experiences = catetories.filter((item) => {
     const today = new Date();
     const eDay = new Date(item.endDay);
-
     return eDay >= today;
   });
 
