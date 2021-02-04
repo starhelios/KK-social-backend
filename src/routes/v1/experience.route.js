@@ -8,7 +8,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(auth(), validate(experienceValidation.createExperience), experienceController.createExperience)
+  .post(validate(experienceValidation.createExperience), experienceController.createExperience)
   .get(validate({}), experienceController.getAll);
 router.route('/createSpecificExperience/:id').post(experienceController.createSpecificExperience);
 router.route('/rate').post(experienceController.rateSpecificExperience);
