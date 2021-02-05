@@ -22,6 +22,10 @@ const createExperience = async (experienceBody) => {
     userId,
     specificExperiences,
   } = experienceBody;
+  if (await Experience.isTitleTaken(title)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Experience name already taken');
+  }
+  const { location } = await User.findById({ _id: userId });
   const newExperience = {
     title,
     description,
@@ -32,10 +36,8 @@ const createExperience = async (experienceBody) => {
     endDay,
     categoryName,
     userId,
+    location,
   };
-  if (await Experience.isTitleTaken(title)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Experience name already taken');
-  }
   const savedExperience = await Experience.create(newExperience);
   console.log(savedExperience);
   specificExperiences.forEach((element) => {
@@ -156,6 +158,7 @@ const getExperienceById = async (id) => {
     userId,
     createAt,
     updatedAt,
+    location,
   } = findExperience;
   const responseData = {
     id: _id,
@@ -172,6 +175,7 @@ const getExperienceById = async (id) => {
     userId,
     createAt,
     updatedAt,
+    location,
     hostData: {
       fullname: findHostInfo.fullname,
       email: findHostInfo.email,

@@ -54,6 +54,9 @@ const experienceSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
+    location: {
+      type: String,
+    },
     specificExperience: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Specific Experience' }],
   },
   {
