@@ -64,7 +64,7 @@ const generateStripeConnectAccountLink = async (userId) => {
       const accountLinks = await stripe.accountLinks.create({
         account: `${user.stripeConnectID}`,
         refresh_url: `${process.env.FRONTENT_ENDPOINT}/profile?type=refresh_url`,
-        return_url: `${process.env.FRONTENT_ENDPOINT}profile?type=success`,
+        return_url: `${process.env.FRONTENT_ENDPOINT}` + `profile?type=success`,
         type: 'account_onboarding',
       });
       return accountLinks.url;
@@ -72,7 +72,7 @@ const generateStripeConnectAccountLink = async (userId) => {
       const accountLinks = await stripe.accountLinks.create({
         account: `${user.stripeConnectID}`,
         refresh_url: `${process.env.FRONTENT_ENDPOINT}/profile?type=refresh_url`,
-        return_url: `${process.env.FRONTENT_ENDPOINT}profile?type=success`,
+        return_url: `${process.env.FRONTENT_ENDPOINT}` + `profile?type=success`,
         type: 'account_onboarding',
       });
       return accountLinks.url;
