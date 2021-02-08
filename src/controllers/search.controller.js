@@ -14,6 +14,7 @@ const search = catchAsync(async (req, res) => {
   if (location.length > 0) {
     userQuery.location = { $regex: new RegExp(`.*${location}.*`, 'i') };
   }
+  
   const users = await User.find(userQuery).exec();
 
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
@@ -31,6 +32,10 @@ const search = catchAsync(async (req, res) => {
   
   if (minPrice && maxPrice) {
     query.price = { $gte: minPrice, $lte: maxPrice };
+  }
+
+  if (location.length > 0) {
+    query.location = { $regex: new RegExp(`.*${location}.*`, 'i') };
   }
 
   const catetories = await Experience.find(query).exec();
