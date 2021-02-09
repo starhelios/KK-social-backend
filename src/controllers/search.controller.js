@@ -12,7 +12,8 @@ const search = catchAsync(async (req, res) => {
   };
 
   if (location.length > 0) {
-    userQuery.location = { $regex: new RegExp(`.*${location}.*`, 'i') };
+    const searchLocation = location.replace(', USA', '');
+    userQuery.location = { $regex: new RegExp(`.*${searchLocation}.*`, 'i') };
   }
   
   const users = await User.find(userQuery).exec();
