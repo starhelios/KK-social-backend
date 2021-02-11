@@ -13,6 +13,10 @@ router
 router.route('/createSpecificExperience/:id').post(experienceController.createSpecificExperience);
 router.route('/rate').post(experienceController.rateSpecificExperience);
 
+router.route('/build').post(experienceController.buildUserZoomExperience);
+router.route('/build/:id').get(experienceController.getBuiltExperience);
+router.route('/complete').post(experienceController.completeSpecificExperience);
+
 router.route('/reserve').post(validate(experienceValidation.reserveExperience), experienceController.reserveExperience); //TODO Add auth() to this route.
 router.route('/reserved/:id').get(experienceController.getUserBookings);
 

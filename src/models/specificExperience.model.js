@@ -24,6 +24,12 @@ const specificExperienceSchema = mongoose.Schema(
     completed: {
       type: Boolean,
     },
+    zoomMeetingId: {
+      type: Number,
+    },
+    zoomMeetingPassword: {
+      type: String,
+    },
     ratings: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Rating' }],
     usersGoing: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User' }],
     reservations: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Reservation' }],

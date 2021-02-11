@@ -126,6 +126,30 @@ const removeDateAvaibility = catchAsync(async (req, res) => {
   res.send(generateResponse(true, { experience }));
 });
 
+const buildUserZoomExperience = catchAsync(async (req, res) => {
+  const experienceBuilt = await experienceService.buildUserZoomExperience(req.body);
+  if (!experienceBuilt) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Experience wasn't built");
+  }
+  res.send(generateResponse(true, { experienceBuilt }));
+});
+
+const getBuiltExperience = catchAsync(async (req, res) => {
+  const experienceBuilt = await experienceService.getUserZoomExperience(req.params.id);
+  if (!experienceBuilt) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Experience wasn't built");
+  }
+  res.send(generateResponse(true, { experienceBuilt }));
+});
+
+const completeSpecificExperience = catchAsync(async (req, res) => {
+  const completedExperience = await experienceService.completeSpecificExperience(req.body);
+  if (!completedExperience) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Experience wasn't built");
+  }
+  res.send(generateResponse(true, { completedExperience }));
+});
+
 module.exports = {
   createExperience,
   createSpecificExperience,
@@ -137,4 +161,7 @@ module.exports = {
   addSpecificExperience,
   removeDateAvaibility,
   reserveExperience,
+  buildUserZoomExperience,
+  getBuiltExperience,
+  completeSpecificExperience,
 };
