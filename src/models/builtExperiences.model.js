@@ -1,8 +1,6 @@
-const { string } = require('@hapi/joi');
 const mongoose = require('mongoose');
-const { toJSON, paginate } = require('./plugins');
 
-const BuiltExperiencesSchema = mongoose.Schema({
+const builtexperiencesSchema = mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -27,6 +25,6 @@ const BuiltExperiencesSchema = mongoose.Schema({
   },
 });
 
-const BuiltExperience = mongoose.model('BuiltExperience', BuiltExperiencesSchema);
+const BuiltExperience = mongoose.model('BuiltExperience', builtexperiencesSchema);
 
 module.exports = BuiltExperience;
