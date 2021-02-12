@@ -1,8 +1,8 @@
 const httpStatus = require('http-status');
 const moment = require('moment');
 const { Experience, User, SpecificExperience, Reservation, Rating, BuiltExperience } = require('../models');
+const axios = require('axios');
 const { populate } = require('../models/user.model');
-const request = require('request-promise');
 const ApiError = require('../utils/ApiError');
 
 const getExperienceByName = async (name) => {
@@ -29,7 +29,8 @@ const createExperience = async (experienceBody) => {
   //TODO Need to validate zoom email is the same as the one on our end.
   try {
     const { location, zoomRefreshToken } = await User.findById({ _id: userId });
-    const response = await request({
+    console.log('here');
+    const response = await axios({
       url: `https://zoom.us/oauth/token?grant_type=refresh_token&refresh_token=${zoomRefreshToken}`,
       method: 'POST',
       headers: {
@@ -38,8 +39,9 @@ const createExperience = async (experienceBody) => {
         )}`,
       },
     });
-    const newRefreshToken = JSON.parse(response).refresh_token;
-    const newAccessToken = JSON.parse(response).access_token;
+    console.log('normal', response.data);
+    const newRefreshToken = response.data.refresh_token;
+    const newAccessToken = response.data.access_token;
     const newUser = await User.findByIdAndUpdate(
       { _id: userId },
       { zoomAccessToken: newAccessToken, zoomRefreshToken: newRefreshToken },
@@ -55,13 +57,13 @@ const createExperience = async (experienceBody) => {
     const asyncForEach = new Promise((resolve, reject) => {
       specificExperiences.forEach(async (item, idx) => {
         const zoomStartTime = new Date(item.day + ' ' + item.startTime).toISOString();
-        const response = await request({
+        const response = await axios({
           url: `https://api.zoom.us/v2/users/${zoomId}/meetings`,
           method: 'POST',
           headers: {
             Authorization: `Bearer ${newMeetingAccessToken}`,
           },
-          json: {
+          data: {
             start_time: zoomStartTime,
             duration: duration,
             password: '',
@@ -71,9 +73,10 @@ const createExperience = async (experienceBody) => {
             },
           },
         });
-        if (response && response.id && response.password) {
-          meetingIdArray.push(response.id);
-          meetingPasswordArray.push(response.password);
+        if (response && response.data && response.data.id) {
+          console.log('pushing');
+          meetingIdArray.push(response.data.id);
+          meetingPasswordArray.push(response.data.password);
         }
         if (idx === specificExperiences.length - 1) {
           resolve();
@@ -93,9 +96,8 @@ const createExperience = async (experienceBody) => {
         userId,
         location,
       };
+      console.log('meeting array', meetingIdArray);
       const savedExperience = await Experience.create(newExperience);
-      console.log(meetingIdArray);
-      console.log(meetingPasswordArray);
       specificExperiences.forEach((element, idx) => {
         element.imageUrl = savedExperience.images[0];
         element.experience = savedExperience._id;
@@ -110,10 +112,11 @@ const createExperience = async (experienceBody) => {
         { _id: savedExperience._id },
         { $push: { specificExperience: experienceIds } }
       );
+      console.log('success...');
       return { savedExperience, savedSpecificExperiences, pushToExperienceModel };
     });
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
   }
 };
 
