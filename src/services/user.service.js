@@ -1,3 +1,4 @@
+const request = require('request-promise');
 const httpStatus = require('http-status');
 
 const { User } = require('../models');

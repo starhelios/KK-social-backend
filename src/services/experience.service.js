@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const moment = require('moment');
 const { Experience, User, SpecificExperience, Reservation, Rating, BuiltExperience } = require('../models');
 const { populate } = require('../models/user.model');
+const request = require('request-promise');
 const ApiError = require('../utils/ApiError');
 
 const getExperienceByName = async (name) => {
@@ -294,6 +295,54 @@ const deleteExperienceById = async (categoryId) => {
   await category.remove();
   return category;
 };
+const buildUserZoomExperience = async (body) => {
+  const specificExperience = await SpecificExperience.findById(body.specificExperienceId).populate('experience');
+  const user = await User.findById(body.userId);
+  const { userRole } = body;
+  const { zoomMeetingId, zoomMeetingPassword } = specificExperience;
+  const title = specificExperience.experience.title;
+  const { email, fullname } = user;
+  const data = {
+    title,
+    email,
+    fullname,
+    userRole,
+    meetingId: zoomMeetingId,
+    meetingPassword: zoomMeetingPassword,
+  };
+  const builtExperience = await BuiltExperience.create(data);
+  const specificUrlExperienceId = builtExperience._id;
+  return specificUrlExperienceId;
+};
+
+const getUserZoomExperience = async (id) => {
+  try {
+    const convertFromBase64 = Buffer.from(id, 'base64').toString('utf8');
+    const builtExperience = await BuiltExperience.findById(convertFromBase64);
+    return builtExperience;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const completeSpecificExperience = async (body) => {
+  try {
+    console.log(body);
+    const specificExperience = await SpecificExperience.updateMany(
+      { _id: { $in: body.ids } },
+      {
+        $set: {
+          completed: true,
+        },
+      },
+      { multi: true, upsert: true }
+    );
+    console.log(specificExperience);
+    return specificExperience;
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 module.exports = {
   getExperienceByName,
@@ -306,4 +355,7 @@ module.exports = {
   getExperienceById,
   updateExperienceById,
   deleteExperienceById,
+  buildUserZoomExperience,
+  getUserZoomExperience,
+  completeSpecificExperience,
 };
