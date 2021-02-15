@@ -102,6 +102,15 @@ const userSchema = mongoose.Schema(
     location: {
       type: String,
     },
+    zoomId: {
+      type: String,
+    },
+    zoomAccessToken: {
+      type: String,
+    },
+    zoomRefreshToken: {
+      type: String,
+    },
     experiences: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Experience' }],
     bankInfo: [bankInfo],
     bookingInfo: [bookingInfo],

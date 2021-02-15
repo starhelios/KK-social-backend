@@ -8,3 +8,4 @@ module.exports.Tutorial = require('./tutorial.model');
 module.exports.Rating = require('./rating.model');
 module.exports.SpecificExperience = require('./specificExperience.model');
 module.exports.Reservation = require('./reservation.model');
+module.exports.BuiltExperience = require('./builtExperiences.model');
