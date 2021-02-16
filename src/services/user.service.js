@@ -3,6 +3,7 @@ const axios = require('axios');
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { createStripeConnectAccount } = require('./payment.service');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const createUser = async (userBody) => {
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
@@ -22,7 +23,16 @@ const queryUsers = async (filter, options) => {
 };
 
 const getUserById = async (id) => {
-  return User.findById(id);
+  //TODO Check if user account is validated by stripe
+  const user = await User.findById(id);
+  const account = await stripe.accounts.retrieve(user.stripeConnectID);
+  const updatedUser = await User.findByIdAndUpdate(
+    { _id: id },
+    { stripeAccountVerified: account.details_submitted },
+    { upsert: true, new: true }
+  );
+
+  return updatedUser;
 };
 
 const updateUserById = async (userId, updateBody) => {
@@ -31,7 +41,7 @@ const updateUserById = async (userId, updateBody) => {
   const { zoomAuthToken, email } = updateBody;
   if (zoomAuthToken && zoomAuthToken.length) {
     const response = await axios({
-      url: `https://zoom.us/oauth/token?grant_type=authorization_code&code=${zoomAuthToken}&redirect_uri=http://localhost:3000/profile/zoom-confirmation`,
+      url: `https://zoom.us/oauth/token?grant_type=authorization_code&code=${zoomAuthToken}&redirect_uri=http://localhost:3000/profile`,
       method: 'POST',
       headers: {
         Authorization: `Basic ${Buffer.from(process.env.ZOOM_CLIENT_ID + ':' + process.env.ZOOM_CLIENT_SECRET).toString(
@@ -47,9 +57,7 @@ const updateUserById = async (userId, updateBody) => {
         Authorization: `Bearer ${access_token}`,
       },
     });
-    console.log('user....', user.data);
     const { id } = user.data;
-    console.log(refresh_token.length);
     User.findByIdAndUpdate(
       {
         _id: userId,
@@ -59,6 +67,7 @@ const updateUserById = async (userId, updateBody) => {
         zoomAccessToken: access_token,
         zoomRefreshToken: refresh_token,
       },
+      { new: true },
       function (err, docs) {
         console.log(docs);
         return docs;

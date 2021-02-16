@@ -12,6 +12,7 @@ router.route('/charge-generate-intent/experience').post(auth(), validate({}), pa
 router.route('/methods/card').post(auth(), validate({}), paymentController.savePaymentMethod);
 router.route('/save-transaction').post(auth(), validate({}), paymentController.savePaymentTransactionInDB);
 router.route('/delete-payment-method').post(auth(), validate({}), paymentController.deletePaymentMethod);
+router.route('/delete-payment').post(auth(), validate({}), paymentController.deletePayment);
 
 // router.route('/stripe/webhook').post(validate({}), paymentController.generateAccountLink);
 

@@ -28,6 +28,23 @@ const deleteCustomerPaymentMethod = async (data, userID) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Something went wrong while finishing up setup.');
   }
 };
+const deletePayment = async (pmId, userId) => {
+  const paymentMethod = await stripe.paymentMethods.detach(pmId);
+  console.log(paymentMethod);
+  if (!paymentMethod.id) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Payment not found');
+  }
+  const updatedUser = await User.findByIdAndUpdate(
+    { _id: userId },
+    { $pull: { availableMethods: { id: pmId } } },
+    { new: true, upsert: true, multi: true }
+  );
+  if (updatedUser) {
+    return 'Payment method deleted';
+  } else {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+};
 const createStripeConnectAccount = async (userId) => {
   try {
     const user = await User.findById({ _id: userId });
@@ -249,4 +266,5 @@ module.exports = {
   createCustomerForPlatformAccount,
   saveTransactionInDB,
   deleteCustomerPaymentMethod,
+  deletePayment,
 };

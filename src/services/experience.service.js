@@ -183,12 +183,15 @@ const reserveExperience = async (data) => {
 
 const getAll = async (query) => {
   const experiences = await Experience.find(query);
+  // console.log(experiences);
   const result = experiences.filter((item) => {
     const today = new Date();
     const endDay = new Date(item.endDay);
 
     return endDay >= today;
   });
+
+  console.log(result);
 
   return result;
 };
@@ -225,7 +228,7 @@ const getExperienceById = async (id) => {
     startDay,
     endDay,
     userId,
-    createAt,
+    createdAt,
     updatedAt,
     location,
   } = findExperience;
@@ -242,7 +245,7 @@ const getExperienceById = async (id) => {
     startDay,
     endDay,
     userId,
-    createAt,
+    createdAt,
     updatedAt,
     location,
     hostData: {
