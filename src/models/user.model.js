@@ -89,6 +89,9 @@ const userSchema = mongoose.Schema(
       type: String,
       default: '',
     },
+    stripeAccountVerified: {
+      type: Boolean,
+    },
     aboutMe: {
       type: String,
     },

@@ -55,10 +55,19 @@ const deletePaymentMethod = catchAsync(async (req, res) => {
   res.send(generateResponse(true, deletePaymentMethodRes));
 });
 
+const deletePayment = catchAsync(async (req, res) => {
+  const response = await paymentService.deletePayment(req.body.pmId, req.body.userId);
+  if (!response) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Payment not found');
+  }
+  res.send(generateResponse(true, response));
+});
+
 module.exports = {
   generateAccountLink,
   chargeCustomer,
   savePaymentMethod,
   savePaymentTransactionInDB,
   deletePaymentMethod,
+  deletePayment,
 };
