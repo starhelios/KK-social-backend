@@ -152,6 +152,7 @@ const completeSpecificExperience = catchAsync(async (req, res) => {
 
 const uploadPhoto = catchAsync(async (req, res) => {
   const uploadedPhoto = await experienceService.uploadPhoto(req.file);
+  console.log(req.file);
   if (!uploadedPhoto) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No photo uploaded');
   }

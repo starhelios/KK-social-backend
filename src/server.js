@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -52,12 +51,6 @@ app.options('*', cors());
 // jwt authentication
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
-
-app.use(
-  fileUpload({
-    createParentPath: true,
-  })
-);
 
 // v1 api routes
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
