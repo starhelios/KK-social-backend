@@ -150,6 +150,14 @@ const completeSpecificExperience = catchAsync(async (req, res) => {
   res.send(generateResponse(true, { completedExperience }));
 });
 
+const uploadPhoto = catchAsync(async (req, res) => {
+  const uploadedPhoto = await experienceService.uploadPhoto(req.file);
+  if (!uploadedPhoto) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No photo uploaded');
+  }
+  res.send(generateResponse(true, { uploadedPhoto }));
+});
+
 module.exports = {
   createExperience,
   createSpecificExperience,
@@ -164,4 +172,5 @@ module.exports = {
   buildUserZoomExperience,
   getBuiltExperience,
   completeSpecificExperience,
+  uploadPhoto,
 };
