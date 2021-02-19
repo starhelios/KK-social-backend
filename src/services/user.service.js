@@ -23,6 +23,17 @@ const queryUsers = async (filter, options) => {
 };
 
 const getUserById = async (id) => {
+  const populateQuery = {
+    path: 'experiences',
+    populate: {
+      path: 'specificExperience',
+      model: 'Specific Experience',
+      populate: {
+        path: 'ratings',
+        model: 'Rating',
+      },
+    },
+  };
   //TODO Check if user account is validated by stripe
   const user = await User.findById(id);
   const account = await stripe.accounts.retrieve(user.stripeConnectID);
@@ -30,7 +41,9 @@ const getUserById = async (id) => {
     { _id: id },
     { stripeAccountVerified: account.details_submitted },
     { upsert: true, new: true }
-  );
+  )
+    .populate(populateQuery)
+    .exec();
 
   return updatedUser;
 };

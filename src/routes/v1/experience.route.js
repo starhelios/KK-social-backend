@@ -20,6 +20,8 @@ router.route('/complete').post(experienceController.completeSpecificExperience);
 router.route('/reserve').post(validate(experienceValidation.reserveExperience), experienceController.reserveExperience); //TODO Add auth() to this route.
 router.route('/reserved/:id').get(experienceController.getUserBookings);
 
+router.route('/uploadPhoto').post(uploadPhotoUtil.uploader.single('image'), experienceController.uploadPhoto);
+
 router.post('/filter', validate({}), experienceController.filterExperience);
 router.route('/uploadPhoto').post(uploadPhotoUtil.uploader.single('image'), experienceController.uploadPhoto);
 
