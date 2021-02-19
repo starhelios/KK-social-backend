@@ -6,6 +6,7 @@ const { populate } = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
 const photoUploadUtil = require('../utils/photoUpload');
 const sharp = require('sharp');
+
 const getExperienceByName = async (name) => {
   return Experience.findOne({ name });
 };
@@ -99,6 +100,7 @@ const createExperience = async (experienceBody) => {
       };
       console.log('meeting array', meetingIdArray);
       const savedExperience = await Experience.create(newExperience);
+      const pushToUser = await User.findByIdAndUpdate({ _id: userId }, { $push: { experiences: savedExperience._id } });
       specificExperiences.forEach((element, idx) => {
         element.imageUrl = savedExperience.images[0];
         element.experience = savedExperience._id;
