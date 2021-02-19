@@ -4,7 +4,8 @@ const { Experience, User, SpecificExperience, Reservation, Rating, BuiltExperien
 const axios = require('axios');
 const { populate } = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
-
+const photoUploadUtil = require('../utils/photoUpload');
+const sharp = require('sharp');
 const getExperienceByName = async (name) => {
   return Experience.findOne({ name });
 };
@@ -349,6 +350,34 @@ const completeSpecificExperience = async (body) => {
     console.log(err);
   }
 };
+const uploadPhoto = async (photo) => {
+  try {
+    const resizedImageBuffer = await sharp(photo.buffer).resize(327, 438).toBuffer();
+    const splitFileName = photo.originalname.split('.');
+    const filename = splitFileName[0];
+    const extension = splitFileName[1];
+    const newFileName = `${filename + Date.now() + extension}`;
+    const blob = photoUploadUtil.bucket.file('images/' + newFileName);
+
+    const blobWriter = blob.createWriteStream({
+      metadata: {
+        contentType: photo.mimetype,
+      },
+    });
+    blobWriter.on('error', (err) => console.log(err));
+
+    const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${photoUploadUtil.bucket.name}/o/${encodeURI(
+      blob.name
+    )}?alt=media`;
+    const splitPublicUrl = publicUrl.split('images/');
+    const joinedPublicUrl = splitPublicUrl[0] + 'images%2F' + splitPublicUrl[1];
+    blobWriter.on('finish', () => {});
+    blobWriter.end(resizedImageBuffer);
+    return joinedPublicUrl;
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 module.exports = {
   getExperienceByName,
@@ -364,4 +393,5 @@ module.exports = {
   buildUserZoomExperience,
   getUserZoomExperience,
   completeSpecificExperience,
+  uploadPhoto,
 };

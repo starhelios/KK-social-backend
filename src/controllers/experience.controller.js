@@ -10,9 +10,9 @@ const { Experience } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 const createExperience = catchAsync(async (req, res) => {
-  const catetories = await experienceService.createExperience(req.body);
+  const categories = await experienceService.createExperience(req.body);
 
-  res.status(httpStatus.CREATED).send(generateResponse(true, catetories));
+  res.status(httpStatus.CREATED).send(generateResponse(true, categories));
 });
 
 const getAll = catchAsync(async (req, res) => {
@@ -32,7 +32,7 @@ const filterExperience = catchAsync(async (req, res) => {
 
   const query = {};
 
-  if (categoryName.length > 0) {
+  if (categoryName && categoryName.length > 0) {
     query.categoryName = { $in: categoryName };
   }
 
@@ -43,13 +43,13 @@ const filterExperience = catchAsync(async (req, res) => {
   if (minPrice && maxPrice) {
     query.price = { $gte: minPrice, $lte: maxPrice };
   }
-  if (location.length) {
+  if (location && location.length) {
     query.location = location;
   }
 
-  const catetories = await Experience.find(query).exec();
+  const categories = await Experience.find(query).exec();
 
-  const result = catetories.filter((item) => {
+  const result = categories.filter((item) => {
     const today = new Date();
     const eDay = new Date(item.endDay);
 
@@ -150,6 +150,15 @@ const completeSpecificExperience = catchAsync(async (req, res) => {
   res.send(generateResponse(true, { completedExperience }));
 });
 
+const uploadPhoto = catchAsync(async (req, res) => {
+  const uploadedPhoto = await experienceService.uploadPhoto(req.file);
+  console.log(req.file);
+  if (!uploadedPhoto) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No photo uploaded');
+  }
+  res.send(generateResponse(true, { uploadedPhoto }));
+});
+
 module.exports = {
   createExperience,
   createSpecificExperience,
@@ -164,4 +173,5 @@ module.exports = {
   buildUserZoomExperience,
   getBuiltExperience,
   completeSpecificExperience,
+  uploadPhoto,
 };
