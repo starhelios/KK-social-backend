@@ -121,7 +121,9 @@ const updateUserById = async (userId, updateBody) => {
 };
 
 const deleteUserById = async (userId) => {
-  const user = await getUserById(userId);
+  // const user = await getUserById(userId);
+  const user = await User.findById(userId);
+
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
