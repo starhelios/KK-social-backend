@@ -12,18 +12,20 @@ router
   .post(validate(experienceValidation.createExperience), experienceController.createExperience)
   .get(validate({}), experienceController.getAll);
 router.route('/createSpecificExperience/:id').post(experienceController.createSpecificExperience);
-router.route('/rate').post(experienceController.rateSpecificExperience);
-router.route('/build').post(experienceController.buildUserZoomExperience);
-router.route('/build/:id').get(experienceController.getBuiltExperience);
-router.route('/complete').post(experienceController.completeSpecificExperience);
+router.route('/rate').post(auth({}), experienceController.rateSpecificExperience);
+router.route('/build').post(auth({}), experienceController.buildUserZoomExperience);
+router.route('/build/:id').get(auth({}), experienceController.getBuiltExperience);
+router.route('/complete').post(auth({}), experienceController.completeSpecificExperience);
 
-router.route('/reserve').post(validate(experienceValidation.reserveExperience), experienceController.reserveExperience); //TODO Add auth() to this route.
-router.route('/reserved/:id').get(experienceController.getUserBookings);
+router
+  .route('/reserve')
+  .post(auth({}), validate(experienceValidation.reserveExperience), experienceController.reserveExperience); //TODO Add auth() to this route.
+router.route('/reserved/:id').get(auth({}), experienceController.getUserBookings);
 
-router.route('/uploadPhoto').post(uploadPhotoUtil.uploader.single('image'), experienceController.uploadPhoto);
+router.route('/uploadPhoto').post(auth({}), uploadPhotoUtil.uploader.single('image'), experienceController.uploadPhoto);
 
 router.post('/filter', validate({}), experienceController.filterExperience);
-router.route('/uploadPhoto').post(uploadPhotoUtil.uploader.single('image'), experienceController.uploadPhoto);
+router.route('/uploadPhoto').post(auth({}), uploadPhotoUtil.uploader.single('image'), experienceController.uploadPhoto);
 
 router.route('/:id').get(validate(experienceValidation.getById), experienceController.getExperience);
 

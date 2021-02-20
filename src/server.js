@@ -17,6 +17,7 @@ const { jwtStrategy } = require('./config/passport');
 
 const routes = require('./routes/v1');
 const { assignId } = require('./utils/utils');
+const auth = require('./middlewares/auth');
 
 require('dotenv').config();
 
