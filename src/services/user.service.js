@@ -23,29 +23,35 @@ const queryUsers = async (filter, options) => {
 };
 
 const getUserById = async (id) => {
-  const populateQuery = {
-    path: 'experiences',
-    populate: {
-      path: 'specificExperience',
-      model: 'Specific Experience',
-      populate: {
-        path: 'ratings',
-        model: 'Rating',
-      },
-    },
-  };
   //TODO Check if user account is validated by stripe
   const user = await User.findById(id);
-  const account = await stripe.accounts.retrieve(user.stripeConnectID);
-  const updatedUser = await User.findByIdAndUpdate(
-    { _id: id },
-    { stripeAccountVerified: account.details_submitted },
-    { upsert: true, new: true }
-  )
-    .populate(populateQuery)
-    .exec();
 
-  return updatedUser;
+  if(user.isHost) {
+    const populateQuery = {
+      path: 'experiences',
+      populate: {
+        path: 'specificExperience',
+        model: 'Specific Experience',
+        populate: {
+          path: 'ratings',
+          model: 'Rating',
+        },
+      },
+    };
+
+    const account = await stripe.accounts.retrieve(user.stripeConnectID);
+    const updatedUser = await User.findByIdAndUpdate(
+      { _id: id },
+      { stripeAccountVerified: account.details_submitted },
+      { upsert: true, new: true }
+    )
+      .populate(populateQuery)
+      .exec();
+  
+    return updatedUser;
+  } else {
+    return user;
+  }
 };
 
 const updateUserById = async (userId, updateBody) => {
@@ -87,8 +93,7 @@ const updateUserById = async (userId, updateBody) => {
       }
     );
   } else {
-    // const user = await getUserById(userId);
-    const user = await User.findById(id);
+    const user = await getUserById(userId);
 
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
