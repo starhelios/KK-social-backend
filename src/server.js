@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const helmet = require('helmet')
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -28,13 +29,16 @@ app.use(assignId);
 app.use(morgan(':id :method :url :response-time'));
 
 app.use(cookieParser());
+const expiryDate = new Date(Date.now() + 60 * 60 * 1000) //1 hour
 app.use(
   session({
+    secure: true,
     secret: process.env.SECRET,
     name: process.env.APP_NAME,
     proxy: true,
     resave: false,
     saveUninitialized: true,
+    expires: expiryDate
   })
 );
 app.use(bodyParser.json());
@@ -47,6 +51,7 @@ app.use(
     origin: true,
   })
 );
+app.use(helmet());
 app.options('*', cors());
 
 // jwt authentication
