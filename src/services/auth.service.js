@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
+const bcrypt = require('bcryptjs');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
@@ -76,14 +77,14 @@ const changePassword = async (userId, password, newPassword) => {
   if (!user || !(await user.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Incorrect password');
   }
-
-  await userService.updateUserById(user.id, { password: newPassword });
+  newPassword = await bcrypt.hash(newPassword, 8);
+  const updatedUser = await await userService.updateUserById(user.id, { password: newPassword });
 };
 
 const changePasswordLoginWithGoogle = async (userId, newPassword) => {
   const user = await userService.getUserById(userId);
 
-  await userService.updateUserById(user.id, { password: newPassword });
+  await userService.updateUserById(user.id, { password: newPassword }, { upsert: true, new: true });
 };
 
 const verifyAccount = async (userId, secretCode) => {

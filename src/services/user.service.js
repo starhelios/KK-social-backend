@@ -57,6 +57,7 @@ const getUserById = async (id) => {
 const updateUserById = async (userId, updateBody) => {
   console.log(userId);
   console.log('running');
+  console.log('update body', updateBody);
   const { zoomAuthToken, email } = updateBody;
   if (zoomAuthToken && zoomAuthToken.length) {
     const response = await axios({
@@ -100,6 +101,12 @@ const updateUserById = async (userId, updateBody) => {
     }
     if (updateBody.email && (await User.isEmailTaken(updateBody.email, userId))) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+    }
+    if (updateBody.password) {
+      const updatedUser = await (
+        await User.findByIdAndUpdate({ _id: userId }, { password: updateBody.password }, { upsert: true, new: true })
+      ).save();
+      console.log(updatedUser);
     }
 
     const keys = Object.keys(updateBody);
