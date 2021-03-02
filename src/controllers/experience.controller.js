@@ -75,6 +75,14 @@ const getExperience = catchAsync(async (req, res) => {
   }
 });
 
+const getHostExperiencesById = catchAsync(async (req, res) => {
+  const experiences = await experienceService.getHostExperiencesById(req.params.id);
+  if (!experiences) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
+  }
+  res.send(generateResponse(true, { experiences }));
+});
+
 const getUserBookings = catchAsync(async (req, res) => {
   const userBookings = await experienceService.getUserBookings(req.params.id);
   if (!req.params.id) {
@@ -167,6 +175,7 @@ module.exports = {
   filterExperience,
   getExperience,
   addSpecificExperience,
+  getHostExperiencesById,
   removeDateAvaibility,
   reserveExperience,
   buildUserZoomExperience,

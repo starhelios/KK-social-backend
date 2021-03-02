@@ -17,6 +17,8 @@ router.route('/build').post(auth({}), experienceController.buildUserZoomExperien
 router.route('/build/:id').get(auth({}), experienceController.getBuiltExperience);
 router.route('/complete').post(auth({}), experienceController.completeSpecificExperience);
 
+router.route('/getHostExperiences/:id').get(experienceController.getHostExperiencesById);
+
 router
   .route('/reserve')
   .post(auth({}), validate(experienceValidation.reserveExperience), experienceController.reserveExperience); //TODO Add auth() to this route.

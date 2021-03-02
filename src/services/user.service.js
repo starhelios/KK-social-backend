@@ -23,10 +23,9 @@ const queryUsers = async (filter, options) => {
 };
 
 const getUserById = async (id) => {
-  //TODO Check if user account is validated by stripe
   const user = await User.findById(id);
 
-  if(user.isHost) {
+  if (user.isHost) {
     const populateQuery = {
       path: 'experiences',
       populate: {
@@ -47,7 +46,8 @@ const getUserById = async (id) => {
     )
       .populate(populateQuery)
       .exec();
-  
+
+    console.log(updatedUser);
     return updatedUser;
   } else {
     return user;
