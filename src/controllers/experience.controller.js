@@ -15,6 +15,15 @@ const createExperience = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(generateResponse(true, categories));
 });
 
+const updateExperience = catchAsync(async (req, res) => {
+  const experience = await experienceService.updateExperience(req.body);
+  console.log(experience);
+  if (!experience) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Experience not updated');
+  }
+  res.status(httpStatus.CREATED).send(generateResponse(true, experience));
+});
+
 const getAll = catchAsync(async (req, res) => {
   const result = await experienceService.getAll(req.query);
 
@@ -178,6 +187,7 @@ module.exports = {
   getHostExperiencesById,
   removeDateAvaibility,
   reserveExperience,
+  updateExperience,
   buildUserZoomExperience,
   getBuiltExperience,
   completeSpecificExperience,

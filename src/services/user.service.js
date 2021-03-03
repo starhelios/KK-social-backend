@@ -24,6 +24,7 @@ const queryUsers = async (filter, options) => {
 
 const getUserById = async (id) => {
   const user = await User.findById(id);
+  console.log('getting all by user id...');
 
   if (user.isHost) {
     const populateQuery = {

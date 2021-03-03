@@ -29,8 +29,8 @@ const createExperience = async (experienceBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Experience name already taken');
   }
   //TODO Need to validate zoom email is the same as the one on our end.
+  const { location, zoomRefreshToken } = await User.findById({ _id: userId });
   // try {
-  //   const { location, zoomRefreshToken } = await User.findById({ _id: userId });
   //   console.log('here');
   //   const response = await axios({
   //     url: `https://zoom.us/oauth/token?grant_type=refresh_token&refresh_token=${zoomRefreshToken}`,
@@ -98,7 +98,7 @@ const createExperience = async (experienceBody) => {
     userId,
     location,
   };
-  console.log('meeting array', meetingIdArray);
+  // console.log('meeting array', meetingIdArray);
   const savedExperience = await Experience.create(newExperience);
   const pushToUser = await User.findByIdAndUpdate({ _id: userId }, { $push: { experiences: savedExperience._id } });
   specificExperiences.forEach((element, idx) => {
@@ -172,6 +172,83 @@ const rateSpecificExperience = async (data) => {
   }
 };
 
+const updateExperience = async (data) => {
+  let newSpecificExperiences = [];
+  let notNewSpecificExperiences = [];
+  let newIds = [];
+  let notNewIds = [];
+
+  const promise = new Promise((resolve, reject) => {
+    data.specificExperiences.map((item, idx) => {
+      if (item.id && item.id.length) {
+        notNewSpecificExperiences.push(item);
+      } else {
+        newSpecificExperiences.push(item);
+      }
+      if (idx === data.specificExperiences.length - 1) {
+        console.log('resolving one');
+        resolve();
+      }
+    });
+  });
+  const promiseTwo = new Promise((resolve, reject) => {
+    notNewSpecificExperiences.forEach(async (item, idx) => {
+      const updatedSpecificExperience = await SpecificExperience.findByIdAndUpdate(
+        item.id,
+        { ...item },
+        { upsert: true, new: true }
+      );
+      notNewIds.push(updatedSpecificExperience._id);
+      if (idx === notNewSpecificExperiences.length - 1) {
+        console.log('resolving two');
+        resolve();
+      }
+    });
+  });
+
+  const promiseThree = new Promise((resolve, reject) => {
+    if (newSpecificExperiences.length) {
+      newSpecificExperiences.forEach(async (item, idx) => {
+        const createdSpecificExperience = await SpecificExperience.create({ ...item }).catch((err) => {
+          throw err;
+        });
+        console.log(createdSpecificExperience);
+        newIds.push(createdSpecificExperience._id);
+        if (idx === newSpecificExperiences.length - 1) {
+          console.log('resolving three');
+          resolve();
+        }
+      });
+    } else {
+      resolve();
+    }
+  });
+
+  const promisedAll = Promise.all([promise, promiseTwo, promiseThree]).then(async (res) => {
+    const allIds = notNewIds.concat(newIds);
+    const pulledUpdatedExperience = await Experience.findOneAndUpdate(
+      { title: data.title, userId: data.userId },
+      {
+        $pullAll: { specificExperience: notNewIds },
+      },
+      {
+        upsert: true,
+        new: true,
+      }
+    );
+    const pushAllUpdatedExperience = await Experience.findOneAndUpdate(
+      { title: data.title, userId: data.userId },
+      { $push: { specificExperience: allIds } },
+      {
+        upsert: true,
+        new: true,
+      }
+    );
+    console.log(pushAllUpdatedExperience);
+  });
+  return 'Successfully updated experience';
+};
+
 const reserveExperience = async (data) => {
   const { id, paymentIntent, imageUrl, guests, userId } = data;
   //TODO charge card
@@ -186,7 +263,7 @@ const reserveExperience = async (data) => {
 
 const getAll = async (query) => {
   const experiences = await Experience.find(query);
-  // console.log(experiences);
+
   const result = experiences.filter((item) => {
     const today = new Date();
     const endDay = new Date(item.endDay);
@@ -361,7 +438,12 @@ const completeSpecificExperience = async (body) => {
 };
 const uploadPhoto = async (photo) => {
   try {
-    const resizedImageBuffer = await sharp(photo.buffer).resize(327, 438).toBuffer();
+    const resizedImageBuffer = await sharp(photo.buffer)
+      .resize(231, 309)
+      .toBuffer()
+      .catch((err) => {
+        console.log(err);
+      });
     const splitFileName = photo.originalname.split('.');
     const filename = splitFileName[0];
     const extension = splitFileName[1];
@@ -394,6 +476,7 @@ module.exports = {
   createSpecificExperience,
   rateSpecificExperience,
   reserveExperience,
+  updateExperience,
   getUserBookings,
   getAll,
   getExperienceById,

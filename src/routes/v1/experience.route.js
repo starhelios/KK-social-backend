@@ -16,6 +16,7 @@ router.route('/rate').post(auth({}), experienceController.rateSpecificExperience
 router.route('/build').post(auth({}), experienceController.buildUserZoomExperience);
 router.route('/build/:id').get(auth({}), experienceController.getBuiltExperience);
 router.route('/complete').post(auth({}), experienceController.completeSpecificExperience);
+router.route('/updateExperience').post(experienceController.updateExperience);
 
 router.route('/getHostExperiences/:id').get(experienceController.getHostExperiencesById);
 
