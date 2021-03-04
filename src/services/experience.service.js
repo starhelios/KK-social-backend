@@ -179,31 +179,35 @@ const updateExperience = async (data) => {
   let notNewIds = [];
 
   const promise = new Promise((resolve, reject) => {
-    data.specificExperiences.map((item, idx) => {
-      if (item.id && item.id.length) {
-        notNewSpecificExperiences.push(item);
-      } else {
-        newSpecificExperiences.push(item);
-      }
-      if (idx === data.specificExperiences.length - 1) {
-        console.log('resolving one');
-        resolve();
-      }
-    });
+    if (data.specificExperiences.length) {
+      data.specificExperiences.map((item, idx) => {
+        if (item.id && item.id.length) {
+          notNewSpecificExperiences.push(item);
+        } else {
+          newSpecificExperiences.push(item);
+        }
+        if (idx === data.specificExperiences.length - 1) {
+          console.log('resolving one');
+          resolve();
+        }
+      });
+    } else resolve();
   });
   const promiseTwo = new Promise((resolve, reject) => {
-    notNewSpecificExperiences.forEach(async (item, idx) => {
-      const updatedSpecificExperience = await SpecificExperience.findByIdAndUpdate(
-        item.id,
-        { ...item },
-        { upsert: true, new: true }
-      );
-      notNewIds.push(updatedSpecificExperience._id);
-      if (idx === notNewSpecificExperiences.length - 1) {
-        console.log('resolving two');
-        resolve();
-      }
-    });
+    if (notNewSpecificExperiences.length) {
+      notNewSpecificExperiences.forEach(async (item, idx) => {
+        const updatedSpecificExperience = await SpecificExperience.findByIdAndUpdate(
+          item.id,
+          { ...item },
+          { upsert: true, new: true }
+        );
+        notNewIds.push(updatedSpecificExperience._id);
+        if (idx === notNewSpecificExperiences.length - 1) {
+          console.log('resolving two');
+          resolve();
+        }
+      });
+    } else resolve();
   });
 
   const promiseThree = new Promise((resolve, reject) => {
@@ -226,25 +230,33 @@ const updateExperience = async (data) => {
 
   const promisedAll = Promise.all([promise, promiseTwo, promiseThree]).then(async (res) => {
     const allIds = notNewIds.concat(newIds);
-    const pulledUpdatedExperience = await Experience.findOneAndUpdate(
+    delete data.specificExperience;
+    if (allIds.length) {
+      const pulledUpdatedExperience = await Experience.findOneAndUpdate(
+        { title: data.title, userId: data.userId },
+        {
+          $pullAll: { specificExperience: notNewIds },
+        },
+        {
+          upsert: true,
+          new: true,
+        }
+      );
+      const pushAllUpdatedExperience = await Experience.findOneAndUpdate(
+        { title: data.title, userId: data.userId },
+        { $push: { specificExperience: allIds } },
+        {
+          upsert: true,
+          new: true,
+        }
+      );
+    }
+    const updatedExperience = await Experience.findOneAndUpdate(
       { title: data.title, userId: data.userId },
-      {
-        $pullAll: { specificExperience: notNewIds },
-      },
-      {
-        upsert: true,
-        new: true,
-      }
+      { ...data },
+      { upsert: true, new: true }
     );
-    const pushAllUpdatedExperience = await Experience.findOneAndUpdate(
-      { title: data.title, userId: data.userId },
-      { $push: { specificExperience: allIds } },
-      {
-        upsert: true,
-        new: true,
-      }
-    );
-    console.log(pushAllUpdatedExperience);
+    console.log(updatedExperience);
   });
   return 'Successfully updated experience';
 };
