@@ -91,10 +91,12 @@ const resetPassword = catchAsync(async (req, res) => {
 
 const changePassword = catchAsync(async (req, res) => {
   const { userId, password, newPassword, setFirstPass } = req.body;
+  console.log('password request...', req.body);
 
   if (setFirstPass) {
     await authService.changePasswordLoginWithGoogle(userId, newPassword);
   } else {
+    console.log('changing password');
     await authService.changePassword(userId, password, newPassword);
   }
 

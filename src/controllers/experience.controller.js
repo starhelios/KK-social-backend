@@ -15,6 +15,15 @@ const createExperience = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(generateResponse(true, categories));
 });
 
+const updateExperience = catchAsync(async (req, res) => {
+  const experience = await experienceService.updateExperience(req.body);
+  console.log(experience);
+  if (!experience) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Experience not updated');
+  }
+  res.status(httpStatus.CREATED).send(generateResponse(true, experience));
+});
+
 const getAll = catchAsync(async (req, res) => {
   const result = await experienceService.getAll(req.query);
 
@@ -73,6 +82,14 @@ const getExperience = catchAsync(async (req, res) => {
   } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
   }
+});
+
+const getHostExperiencesById = catchAsync(async (req, res) => {
+  const experiences = await experienceService.getHostExperiencesById(req.params.id);
+  if (!experiences) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
+  }
+  res.send(generateResponse(true, { experiences }));
 });
 
 const getUserBookings = catchAsync(async (req, res) => {
@@ -167,8 +184,10 @@ module.exports = {
   filterExperience,
   getExperience,
   addSpecificExperience,
+  getHostExperiencesById,
   removeDateAvaibility,
   reserveExperience,
+  updateExperience,
   buildUserZoomExperience,
   getBuiltExperience,
   completeSpecificExperience,
