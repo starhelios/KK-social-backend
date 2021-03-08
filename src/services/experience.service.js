@@ -177,86 +177,74 @@ const updateExperience = async (data) => {
   let notNewSpecificExperiences = [];
   let newIds = [];
   let notNewIds = [];
+  // console.log(data);
+  const { title, description, duration, price, categoryName, id } = data;
 
   const promise = new Promise((resolve, reject) => {
-    if (data.specificExperiences.length) {
-      data.specificExperiences.map((item, idx) => {
-        if (item.id && item.id.length) {
-          notNewSpecificExperiences.push(item);
-        } else {
-          newSpecificExperiences.push(item);
-        }
-        if (idx === data.specificExperiences.length - 1) {
-          console.log('resolving one');
-          resolve();
-        }
-      });
-    } else resolve();
+    data.specificExperiences.map((item, idx) => {
+      if (item.id && item.id.length) {
+        notNewSpecificExperiences.push(item);
+      } else {
+        newSpecificExperiences.push(item);
+      }
+      if (idx === data.specificExperiences.length - 1) {
+        console.log('resolving one');
+        resolve();
+      }
+    });
   });
   const promiseTwo = new Promise((resolve, reject) => {
-    if (notNewSpecificExperiences.length) {
-      notNewSpecificExperiences.forEach(async (item, idx) => {
-        const updatedSpecificExperience = await SpecificExperience.findByIdAndUpdate(
-          item.id,
-          { ...item },
-          { upsert: true, new: true }
-        );
-        notNewIds.push(updatedSpecificExperience._id);
-        if (idx === notNewSpecificExperiences.length - 1) {
-          console.log('resolving two');
-          resolve();
-        }
-      });
-    } else resolve();
+    notNewSpecificExperiences.forEach(async (item, idx) => {
+      const updatedSpecificExperience = await SpecificExperience.findByIdAndUpdate(
+        item.id,
+        { ...item },
+        { upsert: true, new: true }
+      );
+      console.log(updatedSpecificExperience);
+      notNewIds.push(updatedSpecificExperience._id);
+      if (idx === notNewSpecificExperiences.length - 1) {
+        console.log('resolving two');
+        resolve();
+      }
+    });
   });
 
   const promiseThree = new Promise((resolve, reject) => {
-    if (newSpecificExperiences.length) {
+    if (newSpecificExperiences.length)
       newSpecificExperiences.forEach(async (item, idx) => {
         const createdSpecificExperience = await SpecificExperience.create({ ...item }).catch((err) => {
           throw err;
         });
-        console.log(createdSpecificExperience);
+        // console.log(createdSpecificExperience);
         newIds.push(createdSpecificExperience._id);
         if (idx === newSpecificExperiences.length - 1) {
           console.log('resolving three');
           resolve();
         }
       });
-    } else {
+    else {
+      console.log('resolving three');
       resolve();
     }
   });
 
   const promisedAll = Promise.all([promise, promiseTwo, promiseThree]).then(async (res) => {
     const allIds = notNewIds.concat(newIds);
-    delete data.specificExperience;
-    if (allIds.length) {
-      const pulledUpdatedExperience = await Experience.findOneAndUpdate(
-        { title: data.title, userId: data.userId },
-        {
-          $pullAll: { specificExperience: notNewIds },
-        },
-        {
-          upsert: true,
-          new: true,
-        }
-      );
-      const pushAllUpdatedExperience = await Experience.findOneAndUpdate(
-        { title: data.title, userId: data.userId },
-        { $push: { specificExperience: allIds } },
-        {
-          upsert: true,
-          new: true,
-        }
-      );
-    }
-    const updatedExperience = await Experience.findOneAndUpdate(
-      { title: data.title, userId: data.userId },
-      { ...data },
-      { upsert: true, new: true }
+    await Experience.updateOne(
+      { _id: id },
+      {
+        $unset: { specificExperience: 1 },
+      }
     );
-    console.log(updatedExperience);
+    const pushAllUpdatedExperience = await Experience.findByIdAndUpdate(
+      id,
+      { $push: { specificExperience: allIds }, title, duration, price, description, categoryName },
+      {
+        upsert: true,
+        new: true,
+      }
+    );
+    console.log('updated user experiences...', pushAllUpdatedExperience);
   });
   return 'Successfully updated experience';
 };
