@@ -123,6 +123,13 @@ const userSchema = mongoose.Schema(
   }
 );
 
+userSchema.index(
+  {
+    fullname: 'text',
+  },
+  { name: 'search' }
+);
+
 // add plugin that converts mongoose to json
 userSchema.plugin(toJSON);
 userSchema.plugin(paginate);
