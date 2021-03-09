@@ -74,6 +74,7 @@ const generateStripeConnectAccountLink = async (userId) => {
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
+
     if (!user.stripeConnectID) {
       const stripeConnectAccountID = await createStripeConnectAccount(user._id);
       user.stripeConnectID = stripeConnectAccountID;
@@ -101,7 +102,6 @@ const generateStripeConnectAccountLink = async (userId) => {
 };
 
 const chargeCustomerForExperience = async (data, userID) => {
-  console.log(data);
   try {
     const user = await User.findOne({ _id: userID });
     if (!user) {
@@ -163,7 +163,6 @@ const saveTransactionInDB = async (data, userID) => {
     newTransaction.experienceID = `${data.experienceID}`;
 
     console.log(getPaymentIntent);
-    console.log('-------');
 
     const findHostUser = await User.findOne({
       stripeConnectID: getPaymentIntent.transfer_data.destination,
@@ -204,11 +203,13 @@ const createCustomerForPlatformAccount = async (data, userID) => {
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
+
     let splitMonthAndYear = data.data.cardExpiryDate;
     splitMonthAndYear = splitMonthAndYear.split(' ');
     const expiryDate = parseInt(splitMonthAndYear[0]);
     const expiryYear = parseInt(splitMonthAndYear[1]);
     let isItFirstPaymentMethod = false;
+
     const paymentMethod = await stripe.paymentMethods.create({
       type: 'card',
       card: {
@@ -218,6 +219,12 @@ const createCustomerForPlatformAccount = async (data, userID) => {
         cvc: `${data.data.cardCVV}`,
       },
     });
+
+
+    ///////// ------ ios error fix --------- ///////
+    user.stripeCustomerID = null;
+    /////////--------------------/////////
+
 
     // create stripe customer object if it doesn't exist in database
     if (!user.stripeCustomerID) {
@@ -229,6 +236,7 @@ const createCustomerForPlatformAccount = async (data, userID) => {
       });
       user.stripeCustomerID = customer.id;
     }
+   
     if (!isItFirstPaymentMethod) {
       /**
        * Attach payment method id to customer
@@ -237,6 +245,7 @@ const createCustomerForPlatformAccount = async (data, userID) => {
         customer: `${user.stripeCustomerID}`,
       });
     }
+
     //save payment method ids in db.
     const currentUserPaymentMethods = user.availableMethods;
     const paymentMethodObjectForDatabase = {
