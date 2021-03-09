@@ -6,7 +6,7 @@ const moment = require('moment');
 const catchAsync = require('../utils/catchAsync');
 const { experienceService, userService } = require('../services');
 const { generateResponse } = require('../utils/utils');
-const { Experience } = require('../models');
+const { Experience, User } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 const createExperience = catchAsync(async (req, res) => {
@@ -37,7 +37,7 @@ const reserveExperience = catchAsync(async (req, res) => {
 });
 
 const filterExperience = catchAsync(async (req, res) => {
-  const { categoryName, startDay, endDay, minPrice, maxPrice, location } = req.body;
+  const { categoryName, startDay, endDay, minPrice, maxPrice, location, searchText } = req.body;
 
   const query = {};
 
@@ -55,15 +55,52 @@ const filterExperience = catchAsync(async (req, res) => {
   if (location && location.length) {
     query.location = location;
   }
+  let experiences;
+  let usersArray = [];
+  if (searchText && searchText.length) {
+    const experience = await Experience.find({ $text: { $search: searchText } });
+    const user = await User.find({ $text: { $search: searchText } }).populate('experiences');
+    if (user.length) {
+      let users = [];
+      user.map((item, idx) => {
+        users.push(JSON.parse(JSON.stringify(item)));
+      });
+      if (users.length) {
+        users.map((item, idx) => {
+          if (item.experiences && item.experiences.length) {
+            item.experiences.forEach((element, idx) => {
+              usersArray.push(element);
+            });
+          }
+        });
+      }
+    }
+    experiences = experience;
+  }
 
-  const categories = await Experience.find(query).exec();
+  // console.log(usersArray);
 
-  const result = categories.filter((item) => {
-    const today = new Date();
-    const eDay = new Date(item.endDay);
+  let categories = await Experience.find(query).exec();
+  if (experiences) {
+    categories = experiences;
+  }
+  let result;
+  if (usersArray.length) {
+    result = usersArray.filter((item) => {
+      console.log(item);
+      const today = new Date();
+      const eDay = new Date(item.endDay);
 
-    return eDay >= today;
-  });
+      return eDay >= today;
+    });
+  } else {
+    result = categories.filter((item) => {
+      const today = new Date();
+      const eDay = new Date(item.endDay);
+
+      return eDay >= today;
+    });
+  }
 
   res.status(httpStatus.OK).send(generateResponse(true, result));
 });

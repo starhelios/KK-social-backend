@@ -64,6 +64,14 @@ const experienceSchema = mongoose.Schema(
   }
 );
 
+experienceSchema.index(
+  {
+    title: 'text',
+    'userId.fullname': 'text',
+  },
+  { name: 'search' }
+);
+
 // add plugin that converts mongoose to json
 experienceSchema.plugin(toJSON);
 experienceSchema.plugin(paginate);
