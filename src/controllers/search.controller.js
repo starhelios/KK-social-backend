@@ -10,18 +10,14 @@ const search = catchAsync(async (req, res) => {
     $or: [{ fullname: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }, { aboutMe: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }],
     isHost: true,
   };
-
   if (location.length > 0) {
     const searchLocation = location.replace(', USA', '');
     userQuery.location = { $regex: new RegExp(`.*${searchLocation}.*`, 'i') };
   }
-  
   const users = await User.find(userQuery).exec();
 
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
-
-  const query = { $or: [{ title: { $regex: `${keyword}` } }, { description: { $regex: `${keyword}` } }] };
-
+  const query = { $or: [{ title: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }, { description: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }] };
   if (categoryName.length > 0) {
     query.categoryName = { $in: categoryName };
   }
@@ -32,9 +28,7 @@ const search = catchAsync(async (req, res) => {
   if (minPrice && maxPrice) {
     query.price = { $gte: minPrice, $lte: maxPrice };
   }
-  // if (location.length > 0) {
-  //   query.location = { $regex: new RegExp(`.*${location}.*`, 'i') };
-  // }
+
   const catetories = await Experience.find(query).exec();
 
   const experiences = catetories.filter((item) => {
@@ -42,7 +36,11 @@ const search = catchAsync(async (req, res) => {
     const eDay = new Date(item.endDay);
     return eDay >= today;
   }).filter((item) => {
-    return users.findIndex((u) => u.id == item.userId) >= 0;
+    if (location != '') {
+      return users.findIndex((u) => u.id == item.userId) >= 0;
+    } else {
+      return true;
+    }
   });
 
   res.send(generateResponse(true, { hosts: users, experiences }));
