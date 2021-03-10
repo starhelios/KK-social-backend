@@ -17,7 +17,8 @@ const search = catchAsync(async (req, res) => {
   const users = await User.find(userQuery).exec();
 
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
-  const query = { $or: [{ title: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }, { description: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }] };
+  // const query = { $or: [{ title: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }, { description: { $regex: new RegExp(`.*${keyword}.*`, 'i') } }] };
+  const query = { };
   if (categoryName.length > 0) {
     query.categoryName = { $in: categoryName };
   }
@@ -29,18 +30,25 @@ const search = catchAsync(async (req, res) => {
     query.price = { $gte: minPrice, $lte: maxPrice };
   }
 
-  const catetories = await Experience.find(query).exec();
-
-  const experiences = catetories.filter((item) => {
+  const allExperiences = await Experience.find(query).exec();
+  const experiences = allExperiences.filter((item) => {
     const today = new Date();
     const eDay = new Date(item.endDay);
-    return eDay >= today;
-  }).filter((item) => {
+    if (eDay < today) {
+      return false;
+    }
     if (location != '') {
       return users.findIndex((u) => u.id == item.userId) >= 0;
-    } else {
-      return true;
     }
+    if (keyword != '') {
+      if (item.title.includes(keyword) || item.description.includes(keyword)) {
+        return true;
+      } else {
+        return users.findIndex((u) => u.id == item.userId) >= 0;
+      }
+    }
+
+    return true;   
   });
 
   res.send(generateResponse(true, { hosts: users, experiences }));

@@ -15,7 +15,6 @@ const storage = new Storage({
 
 const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET_URL);
 
-
 module.exports = {
   bucket,
   storage,
