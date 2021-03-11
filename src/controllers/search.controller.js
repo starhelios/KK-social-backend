@@ -23,8 +23,8 @@ const search = catchAsync(async (req, res) => {
     query.categoryName = { $in: categoryName };
   }
   if (startDay && endDay) {
-    query.startDay = { $lte: startDay };
-    query.endDay = { $gte: endDay };
+    query.startDay = { $lte: endDay };
+    query.endDay = { $gte: startDay };
   }
   if (minPrice && maxPrice) {
     query.price = { $gte: minPrice, $lte: maxPrice };
@@ -37,14 +37,14 @@ const search = catchAsync(async (req, res) => {
     if (eDay < today) {
       return false;
     }
-    if (location != '') {
-      return users.findIndex((u) => u.id == item.userId) >= 0;
+    if (location != '' && users.findIndex((u) => u.id == item.userId) < 0) {
+      return false;
     }
     if (keyword != '') {
-      if (item.title.includes(keyword) || item.description.includes(keyword)) {
-        return true;
-      } else {
-        return users.findIndex((u) => u.id == item.userId) >= 0;
+      if (item.title.toLowerCase().includes(keyword.toLowerCase()) == false && item.description.toLowerCase().includes(keyword.toLowerCase()) == false) {
+        if (users.findIndex((u) => u.id == item.userId) < 0) {
+          return false;
+        }
       }
     }
 
