@@ -12,6 +12,15 @@ const register = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(generateResponse(true, { user, tokens }));
 });
 
+const generateCsrfToken = catchAsync(async (req, res) => {
+  const token = await authService.generateCsrfToken(req);
+  if (token.csrf && token.csrf.length) {
+    res.send(generateResponse(true, { token }));
+  } else {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No token');
+  }
+});
+
 const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
@@ -105,6 +114,7 @@ const changePassword = catchAsync(async (req, res) => {
 
 module.exports = {
   register,
+  generateCsrfToken,
   login,
   googleLogin,
   logout,

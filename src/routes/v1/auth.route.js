@@ -18,5 +18,6 @@ router.get(
   validate(authValidation.verifyAccount),
   authController.resetPassword
 );
+router.get('/csrf', authController.generateCsrfToken);
 
 module.exports = router;
