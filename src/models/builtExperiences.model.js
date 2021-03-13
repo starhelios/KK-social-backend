@@ -22,6 +22,7 @@ const builtexperiencesSchema = mongoose.Schema({
   },
   meetingPassword: {
     type: String,
+    private: true,
   },
 });
 

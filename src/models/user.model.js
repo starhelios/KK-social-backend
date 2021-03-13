@@ -84,10 +84,12 @@ const userSchema = mongoose.Schema(
     stripeCustomerID: {
       type: String,
       default: '',
+      private: true,
     },
     stripeConnectID: {
       type: String,
       default: '',
+      private: true,
     },
     stripeAccountVerified: {
       type: Boolean,
@@ -105,14 +107,21 @@ const userSchema = mongoose.Schema(
     location: {
       type: String,
     },
+    isZoom: {
+      type: Boolean,
+      default: false,
+    },
     zoomId: {
       type: String,
+      private: true,
     },
     zoomAccessToken: {
       type: String,
+      private: true,
     },
     zoomRefreshToken: {
       type: String,
+      private: true,
     },
     experiences: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Experience' }],
     bankInfo: [bankInfo],
