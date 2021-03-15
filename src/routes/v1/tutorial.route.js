@@ -15,7 +15,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(validate({}), tutorialController.getTutorials)
+  .get(auth(), validate({}), tutorialController.getTutorials)
   .post(auth(), validate(tutorialValidation.createTutorial), tutorialController.createTutorial);
 
 router.route('/:id').delete(auth(), validate({}), tutorialController.removeTutorial);
