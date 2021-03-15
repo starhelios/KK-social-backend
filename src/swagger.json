@@ -379,6 +379,12 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          },
+          "200": {
+            "description": "A list of users",
+            "schema" : {
+              "$ref": "#/definitions/getUsers"
+            }
           }
         }
       }
@@ -406,6 +412,12 @@
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "User object",
+            "schema" : {
+              "$ref": "#/definitions/getUser"
             }
           }
         }
@@ -1210,9 +1222,70 @@
         }
       }
     },
+    "getUser": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "email": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "fullname": {
+          "type": "string"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "aboutMe": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "isHost": {
+          "type": "string"
+        },
+        "joinDay": {
+          "type": "string"
+        },
+        "availableMethods": {
+          "type": "string"
+        },
+        "experiences": {
+          "type": "string"
+        },
+        "isZoom": {
+          "type": "string"
+        },
+        "stripeAccountVerified": {
+          "type": "string"
+        },
+        "zoomAccessToken": {
+          "type": "string"
+        },
+        "zoomRefreshToken": {
+          "type": "string"
+        }
+      }
+    },
     "Users": {
       "type": "array",
       "$ref": "#/definitions/User"
+    },
+    "getUsers": {
+      "type": "array",
+      "$ref": "#/definitions/getUser"
     },
     "UserAvatar": {
       "properties": {

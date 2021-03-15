@@ -117,11 +117,9 @@ const userSchema = mongoose.Schema(
     },
     zoomAccessToken: {
       type: String,
-      private: true,
     },
     zoomRefreshToken: {
       type: String,
-      private: true,
     },
     experiences: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Experience' }],
     bankInfo: [bankInfo],
