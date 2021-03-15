@@ -9,16 +9,16 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(validate(experienceValidation.createExperience), experienceController.createExperience)
-  .get(validate({}), experienceController.getAll);
+  .post(auth({}), validate(experienceValidation.createExperience), experienceController.createExperience)
+  .get(auth({}), validate({}), experienceController.getAll);
 router.route('/createSpecificExperience/:id').post(experienceController.createSpecificExperience);
 router.route('/rate').post(auth({}), experienceController.rateSpecificExperience);
 router.route('/build').post(auth({}), experienceController.buildUserZoomExperience);
 router.route('/build/:id').get(auth({}), experienceController.getBuiltExperience);
 router.route('/complete').post(auth({}), experienceController.completeSpecificExperience);
-router.route('/updateExperience').post(experienceController.updateExperience);
+router.route('/updateExperience').post(auth({}), experienceController.updateExperience);
 
-router.route('/getHostExperiences/:id').get(experienceController.getHostExperiencesById);
+router.route('/getHostExperiences/:id').get(auth({}), experienceController.getHostExperiencesById);
 
 router
   .route('/reserve')
@@ -30,7 +30,7 @@ router.route('/uploadPhoto').post(auth({}), uploadPhotoUtil.uploader.single('ima
 router.post('/filter', validate({}), experienceController.filterExperience);
 router.route('/uploadPhoto').post(auth({}), uploadPhotoUtil.uploader.single('image'), experienceController.uploadPhoto);
 
-router.route('/:id').get(validate(experienceValidation.getById), experienceController.getExperience);
+router.route('/:id').get(auth({}), validate(experienceValidation.getById), experienceController.getExperience);
 
 router
   .route('/dates/:id')
