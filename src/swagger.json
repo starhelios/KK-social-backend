@@ -451,6 +451,12 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          },
+          "200": {
+            "description": "A list of users",
+            "schema" : {
+              "$ref": "#/definitions/getUsers"
+            }
           }
         }
       }
