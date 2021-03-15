@@ -537,6 +537,25 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          },
+          "200": {
+            "description": "Experience data",
+            "schema" : {
+              "properties": {
+                "savedExperience": {
+                  "$ref": "#/definitions/Experience"
+                },
+                "savedSpecificExperiences": {
+                  "type": "array",
+                  "items": {
+                    "type": "strings"
+                  }
+                },
+                "pushToExperienceMode": {
+                  "type": "strings"
+                }
+              }
+            }
           }
         }
       },
@@ -556,6 +575,12 @@
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "A list of experiences",
+            "schema" : {
+              "$ref": "#/definitions/Experiences"
             }
           }
         }
@@ -577,6 +602,12 @@
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "Experience object",
+            "schema" : {
+              "$ref": "#/definitions/Experience"
             }
           }
         }
@@ -613,6 +644,12 @@
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "Experience object",
+            "schema" : {
+              "$ref": "#/definitions/Experience"
             }
           }
         }
@@ -745,6 +782,25 @@
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "Filter experience",
+            "schema": {
+              "properties": {
+                "experiences": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Experiences"
+                  }
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/getUsers"
+                  }
+                }
+              }
             }
           }
         }
@@ -1240,6 +1296,47 @@
           "type": "string"
         }
       }
+    },
+    "Experience": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "integer"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "specificExperience": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Experiences": {
+      "type": "array",
+      "$ref": "#/definitions/Experience"
     },
     "Error": {
       "required": ["error"],
