@@ -87,6 +87,10 @@ const changePasswordLoginWithGoogle = async (userId, newPassword) => {
   await userService.updateUserById(user.id, { password: newPassword }, { upsert: true, new: true });
 };
 
+const generateCsrfToken = async (req) => {
+  return { csrf: req.csrfToken() };
+};
+
 const verifyAccount = async (userId, secretCode) => {
   try {
     const user = await userService.getUserById(userId);
@@ -115,5 +119,6 @@ module.exports = {
   loginUserWithEmail,
   changePassword,
   changePasswordLoginWithGoogle,
+  generateCsrfToken,
   checkUserWithEmailAndPassword,
 };
