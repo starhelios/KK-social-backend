@@ -837,7 +837,7 @@
     "/build": {
       "get": {
         "tags": ["Payments"],
-        "summary": "Get stripe account link for hosts.",
+        "summary": "Generate Zoom link for join experience",
         "parameters": [{
           "in": "header",
           "name": "Authorization",
@@ -891,7 +891,7 @@
         "name": "itemsNeedUpdatedArray",
         "in": "body",
         "required": true,
-        "description": "ID of the specific experience",
+        "description": "Set completed flag for past experiences",
         "type": "array",
         "items": {
           "type": "string"
@@ -929,7 +929,7 @@
       ],
       "post": {
         "tags": ["Experiences"],
-        "summary": "host experiences for a user",
+        "summary": "Get hosted experience list",
         "responses": {
           "default": {
             "description": "Unexpected error",
@@ -1129,7 +1129,7 @@
     "/search": {
       "post": {
         "tags": ["Search"],
-        "description": "",
+        "description": "Search experiences and hosts",
         "parameters": [{
             "in": "query",
             "name": "minPrice",
