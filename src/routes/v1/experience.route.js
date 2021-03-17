@@ -16,8 +16,8 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(auth({}), validate(experienceValidation.createExperience), experienceController.createExperience)
-  .get(auth({}), validate({}), experienceController.getAll);
+  .post(validate(experienceValidation.createExperience), experienceController.createExperience)
+  .get(validate({}), experienceController.getAll);
 router.route('/createSpecificExperience/:id').post(experienceController.createSpecificExperience);
 router.route('/rate').post(auth({}), experienceController.rateSpecificExperience);
 router.route('/build').post(auth({}), experienceController.buildUserZoomExperience);
@@ -37,7 +37,7 @@ router.route('/uploadPhoto').post(auth({}), uploadPhotoUtil.uploader.single('ima
 router.post('/filter', validate({}), experienceController.filterExperience);
 router.route('/uploadPhoto').post(auth({}), uploadPhotoUtil.uploader.single('image'), experienceController.uploadPhoto);
 
-router.route('/:id').get(auth({}), validate(experienceValidation.getById), experienceController.getExperience);
+router.route('/:id').get(validate(experienceValidation.getById), experienceController.getExperience);
 
 router
   .route('/dates/:id')
