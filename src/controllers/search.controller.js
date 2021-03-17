@@ -22,10 +22,12 @@ const search = catchAsync(async (req, res) => {
   if (categoryName.length > 0) {
     query.categoryName = { $in: categoryName };
   }
+
   if (startDay && endDay) {
     query.startDay = { $lte: endDay };
     query.endDay = { $gte: startDay };
   }
+  
   if (minPrice && maxPrice) {
     query.price = { $gte: minPrice, $lte: maxPrice };
   }
