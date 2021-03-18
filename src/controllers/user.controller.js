@@ -42,12 +42,42 @@ const getUsers = catchAsync(async (req, res) => {
 });
 
 const getUser = catchAsync(async (req, res) => {
-  const user = await userService.getUserById(req.params.userId);
+  let user = await userService.getUserById(req.params.userId);
   console.log(colors.red('this is the user', user));
 
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
+
+  console.log(colors.bgCyan(user));
+  const {
+    experiences,
+    fullname,
+    email,
+    avatarUrl,
+    zoomConnected,
+    isHost,
+    status,
+    images,
+    randomString,
+    availableMethods,
+    dateOfBirth,
+  } = user;
+  const newUser = {
+    experiences,
+    fullname,
+    email,
+    avatarUrl,
+    zoomConnected,
+    isHost,
+    status,
+    images,
+    randomString,
+    availableMethods,
+    dateOfBirth,
+  };
+
+  user = newUser;
 
   res.send(generateResponse(true, user));
 });

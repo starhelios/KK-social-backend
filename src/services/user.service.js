@@ -96,6 +96,7 @@ const updateUserById = async (userId, updateBody) => {
         zoomId: id,
         zoomAccessToken: access_token,
         zoomRefreshToken: refresh_token,
+        zoomConnected: true,
       },
       { new: true },
       function (err, docs) {
