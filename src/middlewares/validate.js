@@ -24,7 +24,9 @@ const validate = (schema) => async (req, res, next) => {
         req.params = { experienceId: `${responseOne._id}` };
       }
     } else if (req.params.reservedId) {
+      console.log(colors.bgYellow(req.params.reservedId));
       const response = await User.findOne({ randomString: req.params.reservedId });
+      console.log('response...', response._id);
       req.params = { reservedId: `${response._id}` };
     } else if (req.params.hostId) {
       return true;

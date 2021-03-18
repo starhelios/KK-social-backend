@@ -370,12 +370,12 @@ const getUserBookings = async (id) => {
     },
   ];
   const userBookings = await SpecificExperience.find({ usersGoing: id })
-    .select('day startTime usersGoing completed endTime ratings experience')
+    .select({ day: 1, startTime: 1, usersGoing: 1, completed: 1, endTime: 1, ratings: 1, experience: 1 })
     .populate(populateQuery)
     .exec();
-  console.log(userBookings);
-  if (!userBookings) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Bookings not found');
+  console.log('userbookings...', userBookings);
+  if (!userBookings.length) {
+    return [];
   }
   return userBookings;
 };

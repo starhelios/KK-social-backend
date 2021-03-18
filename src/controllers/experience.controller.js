@@ -61,8 +61,19 @@ const filterExperience = catchAsync(async (req, res) => {
   let experienceArray = [];
   let usersArray = [];
   if (searchText && searchText.length) {
-    const experience = await Experience.find({ $text: { $search: searchText } });
+    const experience = await Experience.find({ $text: { $search: searchText } }).select({
+      categoryName: 1,
+      price: 1,
+      duration: 1,
+      description: 1,
+      location: 1,
+      id: 1,
+      images: 1,
+      endDay: 1,
+    });
     const user = await User.find({ $text: { $search: searchText } }).populate('experiences userId');
+
+    console.log(colors.bgGreen(experience));
 
     if (user.length) {
       let users = [];
@@ -83,9 +94,9 @@ const filterExperience = catchAsync(async (req, res) => {
     experiences = experience;
   }
 
-  // console.log(experienceArray);
-
-  let categories = await Experience.find(query).exec();
+  let categories = await Experience.find(query)
+    .select({ categoryName: 1, price: 1, duration: 1, description: 1, location: 1, id: 1, images: 1 })
+    .exec();
   if (experiences) {
     categories = experiences;
   }
@@ -106,8 +117,6 @@ const filterExperience = catchAsync(async (req, res) => {
       return eDay >= today;
     });
   }
-
-  console.log(colors.red(result));
 
   res.status(httpStatus.OK).send(generateResponse(true, { experiences: result, users: usersArray }));
 });
