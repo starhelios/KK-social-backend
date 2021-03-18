@@ -20,29 +20,47 @@ const search = catchAsync(async (req, res) => {
 
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
 
-  const query = { $or: [{ title: { $regex: `${keyword}` } }, { description: { $regex: `${keyword}` } }] };
+  // const query = { $or: [{ title: { $regex: `${keyword}` } }, { description: { $regex: `${keyword}` } }] };
 
+  const query = { };
   if (categoryName.length > 0) {
     query.categoryName = { $in: categoryName };
   }
+
   if (startDay && endDay) {
-    query.startDay = { $lte: startDay };
-    query.endDay = { $gte: endDay };
+    query.startDay = { $lte: endDay };
+    query.endDay = { $gte: startDay };
   }
+
   if (minPrice && maxPrice) {
     query.price = { $gte: minPrice, $lte: maxPrice };
   }
-  // if (location.length > 0) {
-  //   query.location = { $regex: new RegExp(`.*${location}.*`, 'i') };
-  // }
-  const catetories = await Experience.find(query).exec();
 
-  const experiences = catetories.filter((item) => {
+  if (location != '' && users.findIndex((u) => u.id == item.userId) < 0) {
+    return false;
+  }
+
+  const allExperiences = await Experience.find(query).exec();
+  const experiences = allExperiences.filter((item) => {
     const today = new Date();
     const eDay = new Date(item.endDay);
-    return eDay >= today;
-  }).filter((item) => {
-    return users.findIndex((u) => u.id == item.userId) >= 0;
+    if (eDay < today) {
+      return false;
+    }
+
+    if (location != '' && users.findIndex((u) => u.id == item.userId) < 0) {
+      return false;
+    }
+    
+    if (keyword != '') {
+      if (item.title.toLowerCase().includes(keyword.toLowerCase()) == false && item.description.toLowerCase().includes(keyword.toLowerCase()) == false) {
+        if (users.findIndex((u) => u.id == item.userId) < 0) {
+          return false;
+        }
+      }
+    }
+
+    return true;   
   });
 
   res.send(generateResponse(true, { hosts: users, experiences }));

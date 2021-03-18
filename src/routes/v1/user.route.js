@@ -24,16 +24,4 @@ router
   .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
-router.route('/bank/:userId').post(auth('manageUsers'), validate(userValidation.addBank), userController.addBank);
-router
-  .route('/bank/:userId/:id')
-  .delete(auth('manageUsers'), validate(userValidation.removeBank), userController.deleteBank);
-
-router
-  .route('/booking/reservation/:userId')
-  .post(auth('manageUsers'), validate(userValidation.reservationBooking), userController.reservationBooking);
-router
-  .route('/booking/join/:userId/:id')
-  .post(auth('manageUsers'), validate(userValidation.joinBooking), userController.joinBooking);
-
 module.exports = router;
