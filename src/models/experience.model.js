@@ -24,6 +24,9 @@ const experienceSchema = mongoose.Schema(
       required: true,
       index: true,
     },
+    randomString: {
+      type: String,
+    },
     description: {
       type: String,
       required: true,

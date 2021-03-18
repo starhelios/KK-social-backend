@@ -3,9 +3,11 @@ const moment = require('moment');
 const { Experience, User, SpecificExperience, Reservation, Rating, BuiltExperience } = require('../models');
 const axios = require('axios');
 const { populate } = require('../models/user.model');
+const randomstring = require('randomstring');
 const ApiError = require('../utils/ApiError');
 const photoUploadUtil = require('../utils/photoUpload');
 const sharp = require('sharp');
+const colors = require('colors');
 
 const getExperienceByName = async (name) => {
   return Experience.findOne({ name });
@@ -29,7 +31,8 @@ const createExperience = async (experienceBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Experience name already taken');
   }
   //TODO Need to validate zoom email is the same as the one on our end.
-  const { location, zoomRefreshToken } = await User.findById({ _id: userId });
+  const { location, zoomRefreshToken, _id } = await User.findOne({ randomString: userId });
+  console.log(colors.yellow(location));
   // try {
   //   console.log('here');
   //   const response = await axios({
@@ -88,6 +91,7 @@ const createExperience = async (experienceBody) => {
   // asyncForEach.then(async () => {
   const newExperience = {
     title,
+    randomString: randomstring.generate(),
     description,
     duration,
     price,
@@ -95,15 +99,16 @@ const createExperience = async (experienceBody) => {
     startDay,
     endDay,
     categoryName,
-    userId,
+    userId: _id,
     location,
   };
   // console.log('meeting array', meetingIdArray);
   const savedExperience = await Experience.create(newExperience);
-  const pushToUser = await User.findByIdAndUpdate({ _id: userId }, { $push: { experiences: savedExperience._id } });
+  const pushToUser = await User.findOneAndUpdate({ randomString: userId }, { $push: { experiences: savedExperience._id } });
   specificExperiences.forEach((element, idx) => {
     element.imageUrl = savedExperience.images[0];
     element.experience = savedExperience._id;
+    element.randomString = randomstring.generate();
     // element.zoomMeetingId = meetingIdArray[idx];
     // element.zoomMeetingPassword = meetingPasswordArray[idx];
   });
@@ -276,11 +281,13 @@ const getAll = async (query) => {
 const getExperienceById = async (id) => {
   const populateQuery = {
     path: 'specificExperience',
+    select: { day: 1, ratings: 1, startTime: 1, endTime: 1, randomString: 1 },
     populate: {
       path: 'ratings',
       model: 'Rating',
     },
   };
+  // const { images, title, location, duration, categoryName, description, price, specificExperience } = experience;
   const findExperience = await Experience.findOne({ _id: id }).populate(populateQuery).exec();
 
   if (!findExperience) {
@@ -334,12 +341,17 @@ const getExperienceById = async (id) => {
 };
 
 const getHostExperiencesById = async (id) => {
-  const experiences = await Experience.find({ userId: id }).populate({
-    path: 'specificExperience',
-    populate: {
-      path: 'experience',
-    },
-  });
+  console.log('getting experiences by id');
+  const experiences = await Experience.find({ userId: id })
+    .populate({
+      path: 'specificExperience',
+      select: ['day', 'endTime', 'ratings', 'id', 'experience', 'completed', 'startTime', 'usersGoing'],
+      populate: {
+        path: 'experience',
+        select: ['images', 'title'],
+      },
+    })
+    .select('specificExperience');
   return experiences;
 };
 
@@ -347,6 +359,7 @@ const getUserBookings = async (id) => {
   const populateQuery = [
     {
       path: 'experience',
+      select: { images: 1, title: 1 },
       populate: {
         path: 'specificExperience',
         model: 'Specific Experience',
@@ -356,7 +369,10 @@ const getUserBookings = async (id) => {
       path: 'ratings',
     },
   ];
-  const userBookings = await SpecificExperience.find({ usersGoing: id }).populate(populateQuery).exec();
+  const userBookings = await SpecificExperience.find({ usersGoing: id })
+    .select('day startTime usersGoing completed endTime ratings experience')
+    .populate(populateQuery)
+    .exec();
   console.log(userBookings);
   if (!userBookings) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Bookings not found');

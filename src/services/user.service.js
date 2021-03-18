@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const axios = require('axios');
+const randomstring = require('randomstring');
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { createStripeConnectAccount } = require('./payment.service');
@@ -7,6 +8,11 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const createUser = async (userBody) => {
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  const randomString = randomstring.generate();
+  userBody.randomString = randomString;
+  if (!userBody.avatarUrl) {
+    userBody.avatarUrl = '';
   }
   const user = await User.create(userBody);
 
@@ -19,7 +25,10 @@ const getUserByEmail = async (email) => {
 
 const queryUsers = async (filter, options) => {
   const users = await User.paginate(filter, options);
-  return users;
+  const newUsers = users.results.map((item, idx) => {
+    return { avatarUrl: item.avatarUrl, fullname: item.fullname, id: item.id, location: item.location };
+  });
+  return newUsers;
 };
 
 const getUserById = async (id) => {

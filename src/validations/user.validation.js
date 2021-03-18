@@ -1,5 +1,4 @@
 const Joi = require('@hapi/joi');
-const { JSONCookie } = require('cookie-parser');
 const { password, objectId } = require('./custom.validation');
 
 const createUser = {

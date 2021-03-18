@@ -4,12 +4,20 @@ const catchAsync = require('../utils/catchAsync');
 const googleOAuth = require('../utils/googleOAuth');
 const { userService, authService, tokenService, emailService } = require('../services');
 const { generateResponse } = require('../utils/utils');
+const colors = require('colors');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
-
-  res.status(httpStatus.CREATED).send(generateResponse(true, { user, tokens }));
+  console.log(colors.green(user));
+  const newUser = {
+    status: user.status,
+    fullname: user.fullname,
+    email: user.email,
+    randomString: user.randomString,
+    avatarUrl: user.avatarUrl,
+  };
+  res.status(httpStatus.CREATED).send(generateResponse(true, { newUser, tokens }));
 });
 
 const generateCsrfToken = catchAsync(async (req, res) => {
@@ -26,8 +34,16 @@ const login = catchAsync(async (req, res) => {
 
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
-
-  res.send(generateResponse(true, { user, tokens }));
+  console.log(colors.red(user));
+  const newUser = {
+    status: user.status,
+    fullname: user.fullname,
+    email: user.email,
+    randomString: user.randomString,
+    avatarUrl: user.avatarUrl,
+    availableMethods: user.availableMethods,
+  };
+  res.send(generateResponse(true, { newUser, tokens }));
 });
 
 const googleLogin = catchAsync(async (req, res) => {
@@ -60,15 +76,32 @@ const googleLogin = catchAsync(async (req, res) => {
       status: 'active',
     });
   }
+  console.log(colors.cyan('user is here', user));
 
   const tokens = await tokenService.generateAuthTokens(user);
 
   const checkUser = await authService.checkUserWithEmailAndPassword(userGoogle.email, 'toilaUser1');
-
+  console.log(colors.red(checkUser));
   if (checkUser) {
-    res.send(generateResponse(true, { user: checkUser, tokens, setFirstPass: true }));
+    const newCheckUser = {
+      status: checkUser.status,
+      fullname: checkUser.fullname,
+      email: checkUser.email,
+      randomString: checkUser.randomString,
+      avatarUrl: checkUser.avatarUrl,
+      availableMethods: checkUser.availableMethods,
+    };
+    res.send(generateResponse(true, { user: newCheckUser, tokens, setFirstPass: true }));
   } else {
-    res.send(generateResponse(true, { user, tokens }));
+    const newUser = {
+      status: user.status,
+      fullname: user.fullname,
+      email: user.email,
+      randomString: user.randomString,
+      avatarUrl: user.avatarUrl,
+      availableMethods: user.availableMethods,
+    };
+    res.send(generateResponse(true, { user: newUser, tokens }));
   }
 });
 
@@ -109,7 +142,7 @@ const changePassword = catchAsync(async (req, res) => {
     await authService.changePassword(userId, password, newPassword);
   }
 
-  res.send(generateResponse(true, null, 'Change password successed!'));
+  res.send(generateResponse(true, null, 'Change password succeeded!'));
 });
 
 module.exports = {

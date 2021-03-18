@@ -36,6 +36,11 @@ const userSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    randomString: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     avatarUrl: {
       type: String,
       required: false,
@@ -104,6 +109,9 @@ const userSchema = mongoose.Schema(
     },
     location: {
       type: String,
+    },
+    zoomConnected: {
+      type: Boolean,
     },
     zoomId: {
       type: String,

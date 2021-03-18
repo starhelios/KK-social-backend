@@ -6,6 +6,7 @@ const { userService } = require('../services');
 const { categoryService } = require('../services');
 const { generateResponse } = require('../utils/utils');
 const Category = require('../models/category.model');
+const colors = require('colors');
 
 const mimeMatch = {
   'image/png': 'png',
@@ -23,7 +24,14 @@ const mimeMatch = {
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
-  res.status(httpStatus.CREATED).send(user);
+  const newUser = {
+    status: user.status,
+    fullname: user.fullname,
+    email: user.email,
+    randomString: user.randomString,
+    avatarUrl: user.avatarUrl,
+  };
+  res.status(httpStatus.CREATED).send(newUser);
 });
 
 const getUsers = catchAsync(async (req, res) => {
@@ -35,6 +43,7 @@ const getUsers = catchAsync(async (req, res) => {
 
 const getUser = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
+  console.log(colors.red('this is the user', user));
 
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -58,7 +67,7 @@ const getHosts = catchAsync(async (req, res) => {
   const filter = { isHost: true };
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await userService.queryUsers(filter, options);
-
+  console.log(colors.green(result));
   res.send(generateResponse(true, result));
 });
 
