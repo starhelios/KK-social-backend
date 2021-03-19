@@ -78,9 +78,6 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    joinDay: {
-      type: Date,
-    },
     location: {
       type: String,
     },

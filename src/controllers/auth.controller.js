@@ -36,12 +36,25 @@ const login = catchAsync(async (req, res) => {
   const tokens = await tokenService.generateAuthTokens(user);
   console.log(colors.red(user));
   const newUser = {
-    status: user.status,
     fullname: user.fullname,
-    email: user.email,
     randomString: user.randomString,
     avatarUrl: user.avatarUrl,
+    dateOfBirth: user.dateOfBirth,
+    email: user.email,
+    status: user.status,
     availableMethods: user.availableMethods,
+    stripeCustomerID: user.stripeCustomerID,
+    stripeConnectID: user.stripeConnectID,
+    stripeAccountVerified: user.stripeAccountVerified,
+    aboutMe: user.aboutMe,
+    isHost: user.isHost,
+    joinDay: user.joinDay,
+    location: user.location,
+    zoomConnected: user.zoomConnected,
+    zoomId: user.zoomId,
+    zoomAccessToken: user.zoomAccessToken,
+    zoomRefreshToken: user.zoomRefreshToken,
+    experiences: user.experiences,
   };
   res.send(generateResponse(true, { newUser, tokens }));
 });

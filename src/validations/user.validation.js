@@ -46,7 +46,6 @@ const updateUser = {
   //     categoryName: Joi.string(),
   //     aboutMe: Joi.string(),
   //     isHost: Joi.boolean(),
-  //     joinDay: Joi.date(),
   //     availableMethods: Joi.array(),
   //     stripeCustomerID: Joi.string(),
   //     stripeConnectID: Joi.string(),

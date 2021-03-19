@@ -77,14 +77,11 @@ const changePassword = async (userId, password, newPassword) => {
   if (!user || !(await user.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Incorrect password');
   }
-  newPassword = await bcrypt.hash(newPassword, 8);
-  const updatedUser = await await userService.updateUserById(user.id, { password: newPassword });
 };
 
 const changePasswordLoginWithGoogle = async (userId, newPassword) => {
   const user = await userService.getUserById(userId);
-
-  await userService.updateUserById(user.id, { password: newPassword }, { upsert: true, new: true });
+  await userService.updateUserById(user.id, { password:  await bcrypt.hash(newPassword, 8) }, { upsert: true, new: true });
 };
 
 const generateCsrfToken = async (req) => {

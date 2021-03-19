@@ -171,6 +171,11 @@ const getHostExperiencesById = catchAsync(async (req, res) => {
   res.send(generateResponse(true, { experiences }));
 });
 
+const getExperiencesByHost = catchAsync(async (req, res) => {
+  const result = await experienceService.getExperiencesByHost(req.params.userId);
+  res.status(httpStatus.OK).send(generateResponse(true, result));
+});
+
 const getUserBookings = catchAsync(async (req, res) => {
   const userBookings = await experienceService.getUserBookings(req.params.reservedId);
   if (!req.params.reservedId) {
@@ -276,6 +281,7 @@ module.exports = {
   getExperience,
   addSpecificExperience,
   getHostExperiencesById,
+  getExperiencesByHost,
   removeDateAvaibility,
   reserveExperience,
   updateExperience,

@@ -354,6 +354,16 @@ const getHostExperiencesById = async (id) => {
     .select('specificExperience');
   return experiences;
 };
+const getExperiencesByHost = async (userId) => {
+  const experiences = await Experience.find({ userId: userId })
+
+  const result = experiences.filter((item) => {
+    const today = new Date();
+    const endDay = new Date(item.endDay);
+    return endDay >= today;
+  });
+  return result;
+};
 
 const getUserBookings = async (id) => {
   const populateQuery = [
@@ -497,6 +507,7 @@ module.exports = {
   getAll,
   getExperienceById,
   getHostExperiencesById,
+  getExperiencesByHost,
   updateExperienceById,
   deleteExperienceById,
   buildUserZoomExperience,

@@ -26,6 +26,7 @@ router.route('/complete').post(auth({}), experienceController.completeSpecificEx
 router.route('/updateExperience').post(auth({}), experienceController.updateExperience);
 
 router.route('/getHostExperiences/:userId').get(validate(), experienceController.getHostExperiencesById);
+router.route('/getExperiencesByHost/:userId').get(validate(), experienceController.getExperiencesByHost);
 
 router
   .route('/reserve')
