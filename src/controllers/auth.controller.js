@@ -132,7 +132,8 @@ const resetPassword = catchAsync(async (req, res) => {
 });
 
 const changePassword = catchAsync(async (req, res) => {
-  const { userId, password, newPassword, setFirstPass } = req.body;
+  const userId = req.params.userId;
+  const { password, newPassword, setFirstPass } = req.body;
   console.log('password request...', req.body);
 
   if (setFirstPass) {

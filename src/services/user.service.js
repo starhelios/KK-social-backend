@@ -26,7 +26,7 @@ const getUserByEmail = async (email) => {
 const queryUsers = async (filter, options) => {
   const users = await User.paginate(filter, options);
   const newUsers = users.results.map((item, idx) => {
-    return { avatarUrl: item.avatarUrl, fullname: item.fullname, id: item.id, location: item.location };
+    return { avatarUrl: item.avatarUrl, fullname: item.fullname, randomString: item.randomString, location: item.location };
   });
   return newUsers;
 };

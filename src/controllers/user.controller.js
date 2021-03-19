@@ -62,6 +62,9 @@ const getUser = catchAsync(async (req, res) => {
     randomString,
     availableMethods,
     dateOfBirth,
+    aboutMe,
+    location,
+    zoomAccessToken,
   } = user;
   const newUser = {
     experiences,
@@ -75,6 +78,9 @@ const getUser = catchAsync(async (req, res) => {
     randomString,
     availableMethods,
     dateOfBirth,
+    aboutMe,
+    location,
+    zoomAccessToken,
   };
 
   user = newUser;
