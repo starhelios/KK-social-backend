@@ -34,6 +34,14 @@
     {
       "name": "Payments",
       "description": "API for payments system host/customers."
+    },
+    {
+      "name": "Search",
+      "description": "API for search of hosts/experiences."
+    },
+    {
+      "name": "Tutorials",
+      "description": "API for tutorial page."
     }
   ],
   "schemes": ["http"],
@@ -56,7 +64,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/CreateUser"
             }
           }
         }
@@ -78,7 +86,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/LoginUser"
             }
           }
         }
@@ -122,7 +130,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/Tokens"
             }
           }
         }
@@ -133,6 +141,13 @@
         "tags": ["Authentication"],
         "description": "change password",
         "parameters": [{
+          "in": "header",
+          "name": "Authorization",
+          "description": "JWT token",
+          "required": true,
+          "type": "string"
+        },
+        {
           "name": "changePasswordParams",
           "in": "body",
           "schema": {
@@ -219,7 +234,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/LoginUser"
             }
           }
         }
@@ -240,7 +255,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/StringPayload"
             }
           }
         }
@@ -269,7 +284,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/StringPayload"
             }
           }
         }
@@ -379,6 +394,12 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          },
+          "200": {
+            "description": "A list of users",
+            "schema" : {
+              "$ref": "#/definitions/getUsers"
+            }
           }
         }
       }
@@ -406,6 +427,12 @@
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "User object",
+            "schema" : {
+              "$ref": "#/definitions/getUser"
             }
           }
         }
@@ -439,74 +466,11 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
-          }
-        }
-      }
-    },
-    "/bank/{userId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "description": "ID of user that we want to find",
-          "type": "string"
-        }
-      ],
-      "post": {
-        "tags": ["Users"],
-        "summary": "Add a bank information to User",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Authorization",
-            "description": "JWT token",
-            "required": true,
-            "type": "string"
           },
-          {
-            "name": "avatar",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/AddBank"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "Unexpected error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
-      }
-    },
-    "/bank/{userId}/{bankId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "description": "ID of user that we want to find",
-          "type": "string"
-        },
-        {
-          "name": "bankId",
-          "in": "path",
-          "required": true,
-          "description": "ID of bank info obj that we want to delete",
-          "type": "string"
-        }
-      ],
-      "delete": {
-        "tags": ["Users"],
-        "summary": "Delete a Bank Information from User",
-        "responses": {
-          "default": {
-            "description": "Unexpected error",
-            "schema": {
-              "$ref": "#/definitions/Error"
+          "200": {
+            "description": "A list of users",
+            "schema" : {
+              "$ref": "#/definitions/getUsers"
             }
           }
         }
@@ -557,7 +521,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/Categories"
             }
           }
         }
@@ -588,38 +552,98 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          },
+          "200": {
+            "description": "Experience data",
+            "schema" : {
+              "properties": {
+                "savedExperience": {
+                  "$ref": "#/definitions/Experience"
+                },
+                "savedSpecificExperiences": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "pushToExperienceMode": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
       "get": {
         "tags": ["Experiences"],
         "summary": "Get all categories in system",
-        "parameters": [{
-          "in": "query",
-          "name": "userId",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }],
+        "parameters": [],
         "responses": {
           "default": {
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          },
+          "200": {
+            "description": "A list of experiences",
+            "schema" : {
+              "$ref": "#/definitions/Experiences"
+            }
+          }
+        }
+      }
+    },
+    "/experiences/updateExperience": {
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Update a experience",
+        "parameters": [{
+            "in": "header",
+            "name": "Authorization",
+            "description": "JWT token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "experienceParams",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/updateExperienceParams"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "Experience data",
+            "schema" : {
+              "properties": {
+                "savedExperience": {
+                  "$ref": "#/definitions/Experience"
+                },
+                "savedSpecificExperiences": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "pushToExperienceMode": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
     },
     "/experiences/{id}": {
-      "parameters": [{
-        "name": "id",
-        "in": "path",
-        "required": true,
-        "description": "ID of experience that we want to find",
-        "type": "string"
-      }],
+      "parameters": [],
       "get": {
         "tags": ["Experiences"],
         "summary": "Get experience with given ID",
@@ -628,6 +652,12 @@
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "Experience object",
+            "schema" : {
+              "$ref": "#/definitions/getExperienceDetail"
             }
           }
         }
@@ -665,34 +695,46 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          },
+          "200": {
+            "description": "Experience object",
+            "schema" : {
+              "$ref": "#/definitions/Experience"
+            }
           }
         }
       }
     },
     "/rate": {
-      "parameters": [
-      {
-        "name": "experienceId",
-        "in": "body",
-        "required": true,
-        "description": "ID of the experience they want to rate",
-        "type": "string"
-      },
-      {
-        "name": "rating",
-        "in": "body",
-        "required": true,
-        "description": "Rating of the specific experience",
-        "type": "number"
-      },
-      {
-        "name": "userId",
-        "in": "body",
-        "required": true,
-        "description": "ID of current user rating experience",
-        "type": "string"
-      }
-    ],
+      "parameters": [{
+          "in": "header",
+          "name": "Authorization",
+          "description": "JWT token",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "experienceId",
+          "in": "body",
+          "required": true,
+          "description": "ID of the experience they want to rate",
+          "type": "string"
+        },
+        {
+          "name": "rating",
+          "in": "body",
+          "required": true,
+          "description": "Rating of the specific experience",
+          "type": "number"
+        },
+        {
+          "name": "userId",
+          "in": "body",
+          "required": true,
+          "description": "ID of current user rating experience",
+          "type": "string"
+        }
+      ],
       "post": {
         "tags": ["Experiences"],
         "summary": "Rate the specific experience",
@@ -707,7 +749,13 @@
       }
     },
     "/reserve": {
-      "parameters": [
+      "parameters": [{
+        "in": "header",
+        "name": "Authorization",
+        "description": "JWT token",
+        "required": true,
+        "type": "string"
+      },
       {
         "name": "id",
         "in": "body",
@@ -758,15 +806,21 @@
       }
     },
     "/reserved/{id}": {
-      "parameters": [
-      {
-        "name": "id",
-        "in": "path",
-        "required": true,
-        "description": "ID of the user",
-        "type": "string"
-      }
-    ],
+      "parameters": [{
+          "in": "header",
+          "name": "Authorization",
+          "description": "JWT token",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the user",
+          "type": "string"
+        }
+      ],
       "post": {
         "tags": ["Experiences"],
         "summary": "Grab all reserved experiences for a user",
@@ -774,7 +828,113 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
+              "$ref": "#/definitions/getReservedBookings"
+            }
+          }
+        }
+      }
+    },
+    "/build": {
+      "get": {
+        "tags": ["Payments"],
+        "summary": "Generate Zoom link for join experience",
+        "parameters": [{
+          "in": "header",
+          "name": "Authorization",
+          "description": "JWT token",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "description": "ID of the user",
+          "type": "string"
+        }
+        ,
+        {
+          "name": "specificExperienceId",
+          "in": "path",
+          "required": true,
+          "description": "ID of the specificExperience",
+          "type": "string"
+        }
+        ,
+        {
+          "name": "userRole",
+          "in": "path",
+          "required": true,
+          "description": "role of the user",
+          "type": "string"
+        }
+      ],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/StringPayload"
+            }
+          }
+        }
+      }
+    },
+    "/complete": {
+      "parameters": [{
+        "in": "header",
+        "name": "Authorization",
+        "description": "JWT token",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "name": "itemsNeedUpdatedArray",
+        "in": "body",
+        "required": true,
+        "description": "Set completed flag for past experiences",
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    ],
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Reserve a specific experience",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
               "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/getHostExperiences": {
+      "parameters": [{
+          "in": "header",
+          "name": "Authorization",
+          "description": "JWT token",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "user_id": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the user",
+          "type": "string"
+        }
+      ],
+      "post": {
+        "tags": ["Experiences"],
+        "summary": "Get hosted experience list",
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/HostExperiences"
             }
           }
         }
@@ -796,6 +956,25 @@
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "Filter experience",
+            "schema": {
+              "properties": {
+                "experiences": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Experiences"
+                  }
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/getUsers"
+                  }
+                }
+              }
             }
           }
         }
@@ -862,7 +1041,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/Hosts"
             }
           }
         }
@@ -883,7 +1062,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/HostDetail"
             }
           }
         }
@@ -897,7 +1076,7 @@
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/Tutorials"
             }
           }
         }
@@ -942,6 +1121,74 @@
             "description": "Unexpected error",
             "schema": {
               "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/search": {
+      "post": {
+        "tags": ["Search"],
+        "description": "Search experiences and hosts",
+        "parameters": [{
+            "in": "query",
+            "name": "minPrice",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "maxPrice",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "startDay",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "endDay",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "categoryName",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "location",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Search"
             }
           }
         }
@@ -1136,6 +1383,61 @@
         }
       }
     },
+    "updateExperienceParams": {
+      "required": ["title"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "integer"
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "startDay": {
+          "type": "string"
+        },
+        "endDay": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dateAvaibility": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "string"
+              },
+              "startTime": {
+                "type": "string"
+              },
+              "endTime": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
     "experienceFilterParams": {
       "required": ["title"],
       "properties": {
@@ -1210,24 +1512,78 @@
         }
       }
     },
+    "getUser": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "email": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "fullname": {
+          "type": "string"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "aboutMe": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "isHost": {
+          "type": "boolean"
+        },
+        "availableMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Card"
+          }
+        },
+        "experiences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "isZoom": {
+          "type": "boolean"
+        },
+        "stripeAccountVerified": {
+          "type": "boolean"
+        },
+        "zoomAccessToken": {
+          "type": "string"
+        },
+        "zoomRefreshToken": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      }
+    },
     "Users": {
       "type": "array",
       "$ref": "#/definitions/User"
+    },
+    "getUsers": {
+      "type": "array",
+      "$ref": "#/definitions/getUser"
     },
     "UserAvatar": {
       "properties": {
         "avatar": {
           "type": "file"
-        }
-      }
-    },
-    "AddBank": {
-      "properties": {
-        "bankName": {
-          "type": "string"
-        },
-        "bankNumber": {
-          "type": "string"
         }
       }
     },
@@ -1241,6 +1597,47 @@
         }
       }
     },
+    "Experience": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "integer"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "specificExperience": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Experiences": {
+      "type": "array",
+      "$ref": "#/definitions/Experience"
+    },
     "Error": {
       "required": ["error"],
       "properties": {
@@ -1253,6 +1650,467 @@
             },
             "message": {
               "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "Token": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "expires": {
+          "type": "string"
+        }
+      }
+    },
+    "Tokens": {
+      "type": "object",
+      "properties": {
+        "access": {
+          "type": "object",
+          "$ref": "#/definitions/Token"
+        },
+        "refresh": {
+          "type": "object",
+          "$ref": "#/definitions/Token"
+        }
+      }
+    },
+    "Card": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "cardBrand": {
+          "type": "string"
+        },
+        "expiryMonth": {
+          "type": "number"
+        },
+        "expiryYear": {
+          "type": "number"
+        },
+        "last4digits": {
+          "type": "string"
+        }
+      }
+    },
+    "Tutorial": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        }
+      }
+    },
+    "Tutorials": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tutorial"
+          }
+        }
+      }
+    },
+    "Category": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "Categories": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Category"
+          }
+        }
+      }
+    },
+    "CreateUser": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "tokens": {
+              "type": "object",
+              "$ref": "#/definitions/Tokens"
+            },
+            "user": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "fullname": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }, 
+                "isHost": {
+                  "type": "boolean"
+                }, 
+                "isZoom": {
+                  "type": "boolean"
+                }, 
+                "status": {
+                  "type": "string"
+                },
+                "experiences": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }, 
+                "availableMethods": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Card"
+                  }
+                }, 
+                "createdAt": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "LoginUser": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "tokens": {
+              "type": "object",
+              "$ref": "#/definitions/Tokens"
+            },
+            "user": {
+              "type": "object",
+              "$ref": "#/definitions/getUser"
+            }
+          }
+        }
+      }
+    },
+    "Hosts": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "number"
+            },
+            "page": {
+              "type": "number"
+            },
+            "results": {
+              "type": "object",
+              "$ref": "#/definitions/getUser"
+            }
+          }
+        }
+      }
+    },
+    "UserDetail": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "email": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "fullname": {
+          "type": "string"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "aboutMe": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "isHost": {
+          "type": "boolean"
+        },
+        "availableMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Card"
+          }
+        },
+        "experiences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Experience"
+          }
+        },
+        "isZoom": {
+          "type": "boolean"
+        },
+        "stripeAccountVerified": {
+          "type": "boolean"
+        },
+        "zoomAccessToken": {
+          "type": "string"
+        },
+        "zoomRefreshToken": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      }
+    },
+    "HostDetail": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "ratingCount": {
+              "type": "number"
+            },
+            "ratingMark": {
+              "type": "number"
+            },
+            "results": {
+              "type": "object",
+              "$ref": "#/definitions/UserDetail"
+            }
+          }
+        }
+      }
+    },
+    "Search": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "experiences": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Experience"
+              }
+            },
+            "hosts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/getUser"
+              }
+            }
+          }
+        }
+      }
+    },
+    "HostExperiences": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "experiences": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Experience"
+              }
+            }
+          }
+        }
+      }
+    },
+    "StringPayload": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "string"
+        }
+      }
+    },
+    "ExperienceDetail": {
+      "properties": {         
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "hostData": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/getUser"
+          }
+        },
+        "duration": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "integer"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "specificExperience": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/SpecificExperience"
+          }
+        }
+      }
+    },
+    "SpecificExperience": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "day": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string"
+        },
+        "endTime": {
+        },
+        "experience": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "type": "string"
+        },
+        "usersGoing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "zoomMeetingId": {
+          "type": "string"
+        },
+        "ratings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reservations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "getExperienceDetail": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "experience": {
+              "type": "object",
+              "$ref": "#/definitions/ExperienceDetail"
+            }
+          }
+        }
+      }
+    },
+    "getReservedBookings": {
+      "properties": {
+        "error": {
+          "type": "object",
+          "$ref": "#/definitions/Error"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "userBookings": {
+              "type": "object",
+              "$ref": "#/definitions/SpecificExperience"
             }
           }
         }

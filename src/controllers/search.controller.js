@@ -20,8 +20,6 @@ const search = catchAsync(async (req, res) => {
 
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
 
-  // const query = { $or: [{ title: { $regex: `${keyword}` } }, { description: { $regex: `${keyword}` } }] };
-
   const query = { };
   if (categoryName.length > 0) {
     query.categoryName = { $in: categoryName };
