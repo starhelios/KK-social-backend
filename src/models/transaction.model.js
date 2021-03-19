@@ -15,11 +15,9 @@ const transactionSchema = mongoose.Schema(
     },
     stripeCustomerID: {
       type: String,
-      private: true,
     },
     stripeConnectID: {
       type: String,
-      private: true,
     },
     stripePaymentIntentID: {
       type: String,
