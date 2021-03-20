@@ -17,7 +17,6 @@ const search = catchAsync(async (req, res) => {
   }
   
   const users = await User.find(userQuery).exec();
-
   const { categoryName, startDay, endDay, minPrice, maxPrice } = req.body;
 
   const query = { };
@@ -32,10 +31,6 @@ const search = catchAsync(async (req, res) => {
 
   if (minPrice && maxPrice) {
     query.price = { $gte: minPrice, $lte: maxPrice };
-  }
-
-  if (location != '' && users.findIndex((u) => u.id == item.userId) < 0) {
-    return false;
   }
 
   const allExperiences = await Experience.find(query).exec();

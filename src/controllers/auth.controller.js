@@ -16,6 +16,21 @@ const register = catchAsync(async (req, res) => {
     email: user.email,
     randomString: user.randomString,
     avatarUrl: user.avatarUrl,
+
+    dateOfBirth: user.dateOfBirth,
+    availableMethods: user.availableMethods,
+    stripeCustomerID: user.stripeCustomerID,
+    stripeConnectID: user.stripeConnectID,
+    stripeAccountVerified: user.stripeAccountVerified,
+    aboutMe: user.aboutMe,
+    isHost: user.isHost,
+    joinDay: user.joinDay,
+    location: user.location,
+    zoomConnected: user.zoomConnected,
+    zoomId: user.zoomId,
+    zoomAccessToken: user.zoomAccessToken,
+    zoomRefreshToken: user.zoomRefreshToken,
+    experiences: user.experiences,
   };
   res.status(httpStatus.CREATED).send(generateResponse(true, { newUser, tokens }));
 });
@@ -36,13 +51,14 @@ const login = catchAsync(async (req, res) => {
   const tokens = await tokenService.generateAuthTokens(user);
   console.log(colors.red(user));
   const newUser = {
+    status: user.status,
     fullname: user.fullname,
+    email: user.email,
     randomString: user.randomString,
     avatarUrl: user.avatarUrl,
-    dateOfBirth: user.dateOfBirth,
-    email: user.email,
-    status: user.status,
     availableMethods: user.availableMethods,
+
+    dateOfBirth: user.dateOfBirth,
     stripeCustomerID: user.stripeCustomerID,
     stripeConnectID: user.stripeConnectID,
     stripeAccountVerified: user.stripeAccountVerified,
@@ -103,6 +119,20 @@ const googleLogin = catchAsync(async (req, res) => {
       randomString: checkUser.randomString,
       avatarUrl: checkUser.avatarUrl,
       availableMethods: checkUser.availableMethods,
+
+      dateOfBirth: checkUser.dateOfBirth,
+      stripeCustomerID: checkUser.stripeCustomerID,
+      stripeConnectID: checkUser.stripeConnectID,
+      stripeAccountVerified: checkUser.stripeAccountVerified,
+      aboutMe: checkUser.aboutMe,
+      isHost: checkUser.isHost,
+      joinDay: checkUser.joinDay,
+      location: checkUser.location,
+      zoomConnected: checkUser.zoomConnected,
+      zoomId: checkUser.zoomId,
+      zoomAccessToken: checkUser.zoomAccessToken,
+      zoomRefreshToken: checkUser.zoomRefreshToken,
+      experiences: checkUser.experiences,
     };
     res.send(generateResponse(true, { user: newCheckUser, tokens, setFirstPass: true }));
   } else {
@@ -113,6 +143,20 @@ const googleLogin = catchAsync(async (req, res) => {
       randomString: user.randomString,
       avatarUrl: user.avatarUrl,
       availableMethods: user.availableMethods,
+
+      dateOfBirth: user.dateOfBirth,
+      stripeCustomerID: user.stripeCustomerID,
+      stripeConnectID: user.stripeConnectID,
+      stripeAccountVerified: user.stripeAccountVerified,
+      aboutMe: user.aboutMe,
+      isHost: user.isHost,
+      joinDay: user.joinDay,
+      location: user.location,
+      zoomConnected: user.zoomConnected,
+      zoomId: user.zoomId,
+      zoomAccessToken: user.zoomAccessToken,
+      zoomRefreshToken: user.zoomRefreshToken,
+      experiences: user.experiences,
     };
     res.send(generateResponse(true, { user: newUser, tokens }));
   }

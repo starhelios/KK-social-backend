@@ -416,7 +416,14 @@ const deleteExperienceById = async (categoryId) => {
 };
 const buildUserZoomExperience = async (body) => {
   const specificExperience = await SpecificExperience.findById(body.specificExperienceId).populate('experience');
-  const user = await User.findById(body.userId);
+
+  let { userId } = body;
+  const response = await User.findOne({ randomString: userId });      
+  if (response != null && response._id != null) {
+    userId = response._id;
+  }
+
+  const user = await User.findById(userId);
   const { userRole } = body;
   const { zoomMeetingId, zoomMeetingPassword } = specificExperience;
   const title = specificExperience.experience.title;
