@@ -1,10 +1,3 @@
-/**
-* @swagger
-* tags:
-*   name: Experiences
-*   description: Experience management
-*/
-
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
@@ -23,10 +16,9 @@ router.route('/rate').post(auth({}), experienceController.rateSpecificExperience
 router.route('/build').post(auth({}), experienceController.buildUserZoomExperience);
 router.route('/build/:id').get(auth({}), experienceController.getBuiltExperience);
 router.route('/complete').post(auth({}), experienceController.completeSpecificExperience);
-router.route('/updateExperience').post(auth({}), experienceController.updateExperience);
+router.route('/updateExperience').post(experienceController.updateExperience);
 
 router.route('/getHostExperiences/:userId').get(validate(), experienceController.getHostExperiencesById);
-router.route('/getExperiencesByHost/:userId').get(validate(), experienceController.getExperiencesByHost);
 
 router
   .route('/reserve')

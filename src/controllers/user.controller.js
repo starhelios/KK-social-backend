@@ -26,33 +26,18 @@ const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   const newUser = {
     status: user.status,
-      fullname: user.fullname,
-      email: user.email,
-      randomString: user.randomString,
-      avatarUrl: user.avatarUrl,
-
-      availableMethods: user.availableMethods,
-      dateOfBirth: user.dateOfBirth,
-      stripeCustomerID: user.stripeCustomerID,
-      stripeConnectID: user.stripeConnectID,
-      stripeAccountVerified: user.stripeAccountVerified,
-      aboutMe: user.aboutMe,
-      isHost: user.isHost,
-      joinDay: user.joinDay,
-      location: user.location,
-      zoomConnected: user.zoomConnected,
-      zoomId: user.zoomId,
-      zoomAccessToken: user.zoomAccessToken,
-      zoomRefreshToken: user.zoomRefreshToken,
-      experiences: user.experiences,
+    fullname: user.fullname,
+    email: user.email,
+    randomString: user.randomString,
+    avatarUrl: user.avatarUrl,
   };
   res.status(httpStatus.CREATED).send(newUser);
 });
 
 const getUsers = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'role']);
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await userService.queryUsers(filter, options);
+  // const filter = pick(req.query, ['name', 'role']);
+  // const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await userService.queryUsers();
   res.send(result);
 });
 
@@ -63,7 +48,6 @@ const getUser = catchAsync(async (req, res) => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-
   console.log(colors.bgCyan(user));
   const {
     experiences,
@@ -77,9 +61,9 @@ const getUser = catchAsync(async (req, res) => {
     randomString,
     availableMethods,
     dateOfBirth,
-    aboutMe,
     location,
-    zoomAccessToken,
+    aboutMe,
+    stripeAccountVerified,
   } = user;
   const newUser = {
     experiences,
@@ -93,9 +77,9 @@ const getUser = catchAsync(async (req, res) => {
     randomString,
     availableMethods,
     dateOfBirth,
-    aboutMe,
     location,
-    zoomAccessToken,
+    aboutMe,
+    stripeAccountVerified,
   };
 
   user = newUser;
@@ -106,7 +90,6 @@ const getUser = catchAsync(async (req, res) => {
 const getHost = catchAsync(async (req, res) => {
   // const userID = req.user._id;
   const user = await userService.getUserById(req.params.userId);
-
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Host not found');
   }
@@ -115,10 +98,11 @@ const getHost = catchAsync(async (req, res) => {
 });
 
 const getHosts = catchAsync(async (req, res) => {
-  const filter = { isHost: true };
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await userService.queryUsers(filter, options);
+  // const filter = { isHost: true };
+  // const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await userService.queryUsers();
   console.log(colors.green(result));
+
   res.send(generateResponse(true, result));
 });
 
@@ -153,6 +137,38 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const addBank = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bankInfo.push(req.body);
+  user.save();
+
+  res.send(generateResponse(true, user, 'Add Bank successed!'));
+});
+
+const deleteBank = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bankInfo.id(req.params.id).remove();
+  user.save();
+
+  res.send(generateResponse(true, user, 'Delete Bank successed!'));
+});
+
+const reservationBooking = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bookingInfo.push(req.body);
+  user.save();
+
+  res.send(generateResponse(true, user, 'Add Booking successed!'));
+});
+
+const joinBooking = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bookingInfo.id(req.params.id).completed = true;
+  user.save();
+
+  res.send(generateResponse(true, user, 'Update Booking successed!'));
+});
+
 module.exports = {
   createUser,
   getUsers,
@@ -161,4 +177,8 @@ module.exports = {
   deleteUser,
   getHosts,
   getHost,
+  addBank,
+  deleteBank,
+  reservationBooking,
+  joinBooking,
 };

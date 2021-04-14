@@ -23,12 +23,21 @@ const getUserByEmail = async (email) => {
   return User.findOne({ email });
 };
 
-const queryUsers = async (filter, options) => {
-  const users = await User.paginate(filter, options);
-  const newUsers = users.results.map((item, idx) => {
-    return { avatarUrl: item.avatarUrl, fullname: item.fullname, randomString: item.randomString, location: item.location };
-  });
-  return newUsers;
+const queryUsers = async (filter) => {
+  // const users = await User.paginate(filter, options).select().exec();
+  const users = await User.find({ isHost: true })
+    .populate({
+      path: 'experiences',
+      select: ['title', 'description', 'price', 'startDay', 'endDay', 'location', 'images', 'ratings', 'categoryName'],
+      populate: {
+        path: 'specificExperience',
+        select: ['ratings'],
+      },
+    })
+    .select({ fullname: 1, avatarUrl: 1, location: 1, joinDay: 1, aboutMe: 1 })
+    .limit(10);
+
+  return users;
 };
 
 const getUserById = async (id) => {
@@ -56,7 +65,7 @@ const getUserById = async (id) => {
     )
       .populate(populateQuery)
       .exec();
-
+    console.log('updatedUser', updatedUser);
     console.log(updatedUser);
     return updatedUser;
   } else {
@@ -71,7 +80,7 @@ const updateUserById = async (userId, updateBody) => {
   const { zoomAuthToken, email } = updateBody;
   if (zoomAuthToken && zoomAuthToken.length) {
     const response = await axios({
-      url: `https://zoom.us/oauth/token?grant_type=authorization_code&code=${zoomAuthToken}&redirect_uri=http://localhost:3000/profile`,
+      url: `https://zoom.us/oauth/token?grant_type=authorization_code&code=${zoomAuthToken}&redirect_uri=https://www.kloutkast.com/profile`,
       method: 'POST',
       headers: {
         Authorization: `Basic ${Buffer.from(process.env.ZOOM_CLIENT_ID + ':' + process.env.ZOOM_CLIENT_SECRET).toString(

@@ -27,6 +27,7 @@ const createExperience = async (experienceBody) => {
     userId,
     specificExperiences,
   } = experienceBody;
+
   if (await Experience.isTitleTaken(title)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Experience name already taken');
   }
@@ -178,12 +179,14 @@ const rateSpecificExperience = async (data) => {
 };
 
 const updateExperience = async (data) => {
+  // console.log(data);
   let newSpecificExperiences = [];
   let notNewSpecificExperiences = [];
   let newIds = [];
   let notNewIds = [];
   // console.log(data);
   const { title, description, duration, price, categoryName, id } = data;
+  //! data is being received correctly on backend
 
   const promise = new Promise((resolve, reject) => {
     data.specificExperiences.map((item, idx) => {
@@ -194,63 +197,79 @@ const updateExperience = async (data) => {
       }
       if (idx === data.specificExperiences.length - 1) {
         console.log('resolving one');
+        // console.log('new...', newSpecificExperiences);
         resolve();
       }
     });
-  });
-  const promiseTwo = new Promise((resolve, reject) => {
-    notNewSpecificExperiences.forEach(async (item, idx) => {
-      const updatedSpecificExperience = await SpecificExperience.findByIdAndUpdate(
-        item.id,
-        { ...item },
-        { upsert: true, new: true }
-      );
-      console.log(updatedSpecificExperience);
-      notNewIds.push(updatedSpecificExperience._id);
-      if (idx === notNewSpecificExperiences.length - 1) {
-        console.log('resolving two');
-        resolve();
-      }
-    });
-  });
+  }).catch((err) => console.log(err));
 
-  const promiseThree = new Promise((resolve, reject) => {
-    if (newSpecificExperiences.length)
-      newSpecificExperiences.forEach(async (item, idx) => {
-        const createdSpecificExperience = await SpecificExperience.create({ ...item }).catch((err) => {
-          throw err;
-        });
-        // console.log(createdSpecificExperience);
-        newIds.push(createdSpecificExperience._id);
-        if (idx === newSpecificExperiences.length - 1) {
-          console.log('resolving three');
+  const promiseTwo = new Promise((resolve, reject) => {
+    console.log('running two');
+    // console.log(notNewSpecificExperiences);
+    if (notNewSpecificExperiences.length) {
+      notNewSpecificExperiences.forEach(async (item, idx) => {
+        const updatedSpecificExperience = await SpecificExperience.findByIdAndUpdate(
+          item.id,
+          { ...item },
+          { upsert: true, new: true }
+        );
+        console.log(updatedSpecificExperience);
+        notNewIds.push(updatedSpecificExperience._id);
+        if (idx === notNewSpecificExperiences.length - 1) {
+          console.log('resolving two');
           resolve();
         }
       });
-    else {
-      console.log('resolving three');
+    } else {
+      console.log('resolving two');
       resolve();
     }
-  });
+  }).catch((err) => console.log(err));
 
-  const promisedAll = Promise.all([promise, promiseTwo, promiseThree]).then(async (res) => {
-    const allIds = notNewIds.concat(newIds);
-    await Experience.updateOne(
-      { _id: id },
-      {
-        $unset: { specificExperience: 1 },
+  const promiseThree = new Promise(async (resolve, reject) => {
+    if (newSpecificExperiences.length > 0) {
+      // console.log('new third...', newSpecificExperiences);
+      const createdSpecificExperience = await SpecificExperience.insertMany(newSpecificExperiences);
+      console.log(createdSpecificExperience);
+      if (createdSpecificExperience.length > 0) {
+        console.log('its longer than 0');
+        createdSpecificExperience.forEach((item, idx) => {
+          newIds.push(item._id);
+          if (idx === newSpecificExperiences.length - 1) {
+            console.log('resolving three');
+            console.log(newIds);
+            resolve();
+          }
+        });
+      } else {
+        console.log('resolving three');
+        console.log(newIds);
+        resolve();
       }
-    );
-    const pushAllUpdatedExperience = await Experience.findByIdAndUpdate(
-      id,
-      { $push: { specificExperience: allIds }, title, duration, price, description, categoryName },
-      {
-        upsert: true,
-        new: true,
-      }
-    );
-    console.log('updated user experiences...', pushAllUpdatedExperience);
-  });
+    }
+  }).catch((err) => console.log(err));
+  const promiseAll = Promise.all([promise, promiseTwo, promiseThree]);
+  promiseAll
+    .then(async function (res) {
+      console.log('running in all');
+      const allIds = notNewIds.concat(newIds);
+      await Experience.updateOne(
+        { _id: id },
+        {
+          $unset: { specificExperience: 1 },
+        }
+      );
+      const pushAllUpdatedExperience = await Experience.findByIdAndUpdate(
+        id,
+        { $push: { specificExperience: allIds }, title, duration, price, description, categoryName },
+        {
+          upsert: true,
+          new: true,
+        }
+      );
+      console.log('updated user experiences...', pushAllUpdatedExperience);
+    })
+    .catch((err) => console.log(err));
   return 'Successfully updated experience';
 };
 
@@ -268,7 +287,7 @@ const reserveExperience = async (data) => {
 
 const getAll = async (query) => {
   const experiences = await Experience.find(query);
-
+  console.log('experiences...', experiences);
   const result = experiences.filter((item) => {
     const today = new Date();
     const endDay = new Date(item.endDay);
@@ -354,16 +373,6 @@ const getHostExperiencesById = async (id) => {
     .select('specificExperience');
   return experiences;
 };
-const getExperiencesByHost = async (userId) => {
-  const experiences = await Experience.find({ userId: userId })
-
-  const result = experiences.filter((item) => {
-    const today = new Date();
-    const endDay = new Date(item.endDay);
-    return endDay >= today;
-  });
-  return result;
-};
 
 const getUserBookings = async (id) => {
   const populateQuery = [
@@ -416,14 +425,7 @@ const deleteExperienceById = async (categoryId) => {
 };
 const buildUserZoomExperience = async (body) => {
   const specificExperience = await SpecificExperience.findById(body.specificExperienceId).populate('experience');
-
-  let { userId } = body;
-  const response = await User.findOne({ randomString: userId });      
-  if (response != null && response._id != null) {
-    userId = response._id;
-  }
-
-  const user = await User.findById(userId);
+  const user = await User.findById(body.userId);
   const { userRole } = body;
   const { zoomMeetingId, zoomMeetingPassword } = specificExperience;
   const title = specificExperience.experience.title;
@@ -469,14 +471,25 @@ const completeSpecificExperience = async (body) => {
     console.log(err);
   }
 };
-const uploadPhoto = async (photo) => {
+const uploadPhoto = async (photo, path) => {
   try {
-    const resizedImageBuffer = await sharp(photo.buffer)
-      .resize(231, 309)
-      .toBuffer()
-      .catch((err) => {
-        console.log(err);
-      });
+    console.log(photo);
+    let resizedImageBuffer;
+    if (path === '/v1/experiences/uploadPhoto') {
+      resizedImageBuffer = await sharp(photo.buffer)
+        .resize(415, 415)
+        .toBuffer()
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      resizedImageBuffer = await sharp(photo.buffer)
+        .resize(232)
+        .toBuffer()
+        .catch((err) => {
+          console.log(err);
+        });
+    }
     const splitFileName = photo.originalname.split('.');
     const filename = splitFileName[0];
     const extension = splitFileName[1];
@@ -514,7 +527,6 @@ module.exports = {
   getAll,
   getExperienceById,
   getHostExperiencesById,
-  getExperiencesByHost,
   updateExperienceById,
   deleteExperienceById,
   buildUserZoomExperience,

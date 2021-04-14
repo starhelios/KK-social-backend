@@ -8,12 +8,12 @@ const colors = require('colors');
 const validate = (schema) => async (req, res, next) => {
   try {
     //checking the parameters
+    console.log(req.params);
     if (req.params.userId) {
       console.log(colors.red(req.params.userId));
-      const response = await User.findOne({ randomString: req.params.userId });      
-      if (response != null && response._id != null) {
-        req.params = { userId: `${response._id}` };
-      }
+      const response = await User.findOne({ randomString: req.params.userId });
+      console.log(response);
+      req.params = { userId: `${response._id}` };
     } else if (req.params.experienceId) {
       console.log('running');
       console.log(req.params);

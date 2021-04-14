@@ -3,6 +3,32 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 
+const bankInfo = mongoose.Schema({
+  bankName: {
+    type: String,
+    required: true,
+  },
+  bankNumber: {
+    type: String,
+    required: true,
+  },
+});
+
+const bookingInfo = mongoose.Schema({
+  experienceID: {
+    type: String,
+    required: true,
+  },
+  dateAvaibilityID: {
+    type: String,
+    required: true,
+  },
+  completed: {
+    type: Boolean,
+    required: false,
+  },
+});
+
 const userSchema = mongoose.Schema(
   {
     fullname: {
@@ -78,6 +104,9 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    joinDay: {
+      type: Date,
+    },
     location: {
       type: String,
     },
@@ -94,6 +123,8 @@ const userSchema = mongoose.Schema(
       type: String,
     },
     experiences: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Experience' }],
+    bankInfo: [bankInfo],
+    bookingInfo: [bookingInfo],
   },
   {
     timestamps: true,

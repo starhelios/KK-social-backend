@@ -1,5 +1,10 @@
-export const whitelistDev = ['http://localhost:3000', 'http://localhost:3001'];
-export const whitelistProd = ['https://kloutkast.herokuapp.com/', 'https://kloutkast-zoom.herokuapp.com/'];
+export const whitelistDev = ['http://localhost:3000', 'http://localhost:5000'];
+export const whitelistProd = [
+  'https://kloutkast.herokuapp.com/',
+  'https://kloutkast-zoom.herokuapp.com/',
+  'https://kloutkast.com/',
+  'https://*.herokuapp.com/',
+];
 export const corsOptions = {
   origin: function (origin, callback) {
     if (process.env.NODE_ENV !== 'production' && whitelistDev.indexOf(origin) !== -1) {

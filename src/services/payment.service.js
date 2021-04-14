@@ -109,7 +109,7 @@ const chargeCustomerForExperience = async (data, userID) => {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
     console.log('data is here...', userID);
-    const findExperience = await Experience.findOne({ randomString: data.randomString });
+    const findExperience = await Experience.findOne({ _id: data.experienceID });
     if (!findExperience) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Experience not found');
     }
@@ -131,6 +131,7 @@ const chargeCustomerForExperience = async (data, userID) => {
           destination: `${findHostUser.stripeConnectID}`,
         },
       });
+      console.log(paymentIntent);
       return paymentIntent.client_secret;
     } else {
       const paymentIntent = await stripe.paymentIntents.create({
@@ -143,9 +144,11 @@ const chargeCustomerForExperience = async (data, userID) => {
           destination: `${findHostUser.stripeConnectID}`,
         },
       });
+      console.log(paymentIntent);
       return paymentIntent.client_secret;
     }
   } catch (err) {
+    //pushing local changes to override current branch
     console.log(err.message);
     throw new ApiError(httpStatus.BAD_REQUEST, 'Payment method failed.');
   }
@@ -184,7 +187,7 @@ const saveTransactionInDB = async (data, userID) => {
     }
 
     const findExperience = await Experience.findOne({
-      randomString: data.randomString,
+      _id: data.experienceID,
     });
     if (!findExperience) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Experience not found.');

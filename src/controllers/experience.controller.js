@@ -19,10 +19,11 @@ const createExperience = catchAsync(async (req, res) => {
 const updateExperience = catchAsync(async (req, res) => {
   const experience = await experienceService.updateExperience(req.body);
   console.log(experience);
-  if (!experience) {
+  if (!experience.length) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Experience not updated');
+  } else {
+    res.status(httpStatus.CREATED).send(generateResponse(true, { success: true }));
   }
-  res.status(httpStatus.CREATED).send(generateResponse(true, { success: true }));
 });
 
 const getAll = catchAsync(async (req, res) => {
@@ -40,7 +41,7 @@ const reserveExperience = catchAsync(async (req, res) => {
 
 const filterExperience = catchAsync(async (req, res) => {
   const { categoryName, startDay, endDay, minPrice, maxPrice, location, searchText } = req.body;
-
+  console.log(req.body);
   const query = {};
 
   if (categoryName && categoryName.length > 0) {
@@ -70,6 +71,7 @@ const filterExperience = catchAsync(async (req, res) => {
       id: 1,
       images: 1,
       endDay: 1,
+      title: 1,
     });
     const user = await User.find({ $text: { $search: searchText } }).populate('experiences userId');
 
@@ -95,8 +97,32 @@ const filterExperience = catchAsync(async (req, res) => {
   }
 
   let categories = await Experience.find(query)
-    .select({ categoryName: 1, price: 1, duration: 1, description: 1, location: 1, id: 1, images: 1 })
+    .populate({
+      path: 'userId',
+      select: ['avatarUrl', 'aboutMe', 'fullname', 'location', '_id', 'experiences'],
+      populate: {
+        path: 'experiences',
+        select: [
+          'categoryName',
+          'description',
+          'endDay',
+          '_id',
+          'images',
+          'location',
+          'price',
+          'startDay',
+          'title',
+          'specificExperience',
+        ],
+        populate: {
+          path: 'specificExperience',
+          select: ['ratings', '_id'],
+        },
+      },
+    })
+    .select({ categoryName: 1, price: 1, duration: 1, description: 1, location: 1, id: 1, images: 1, endDay: 1, title: 1 })
     .exec();
+  // console.log(categories);
   if (experiences) {
     categories = experiences;
   }
@@ -130,7 +156,9 @@ const getExperience = catchAsync(async (req, res) => {
 
   const user = await userService.getUserById(experience.userId);
   console.log(colors.green('user...', experience));
+  const { avatarUrl, aboutMe } = user;
   const {
+    _id,
     images,
     title,
     location,
@@ -143,6 +171,9 @@ const getExperience = catchAsync(async (req, res) => {
     randomString,
   } = experience;
   const newExperience = {
+    id: _id,
+    aboutMe,
+    avatarUrl,
     randomString,
     images,
     title,
@@ -169,11 +200,6 @@ const getHostExperiencesById = catchAsync(async (req, res) => {
   }
   console.log(colors.rainbow('getting experiences...', experiences));
   res.send(generateResponse(true, { experiences }));
-});
-
-const getExperiencesByHost = catchAsync(async (req, res) => {
-  const result = await experienceService.getExperiencesByHost(req.params.userId);
-  res.status(httpStatus.OK).send(generateResponse(true, result));
 });
 
 const getUserBookings = catchAsync(async (req, res) => {
@@ -263,7 +289,8 @@ const completeSpecificExperience = catchAsync(async (req, res) => {
 });
 
 const uploadPhoto = catchAsync(async (req, res) => {
-  const uploadedPhoto = await experienceService.uploadPhoto(req.file);
+  const uploadedPhoto = await experienceService.uploadPhoto(req.file, req.originalUrl);
+  console.log('original url...', req.originalUrl);
   if (!uploadedPhoto) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No photo uploaded');
   }
@@ -281,7 +308,6 @@ module.exports = {
   getExperience,
   addSpecificExperience,
   getHostExperiencesById,
-  getExperiencesByHost,
   removeDateAvaibility,
   reserveExperience,
   updateExperience,
