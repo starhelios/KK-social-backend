@@ -1,11 +1,13 @@
 const httpStatus = require('http-status');
 const fetch = require('node-fetch');
+const sgMail = require('@sendgrid/mail');
 const catchAsync = require('../utils/catchAsync');
 const googleOAuth = require('../utils/googleOAuth');
 const { userService, authService, tokenService, emailService } = require('../services');
 const { User } = require('../models');
 const { generateResponse } = require('../utils/utils');
 const colors = require('colors');
+const { sendEmail } = require('../services/email.service');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -153,6 +155,23 @@ const changePassword = catchAsync(async (req, res) => {
 
   res.send(generateResponse(true, null, 'Change password succeeded!'));
 });
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const contactUs =  catchAsync(async (req, res) => {
+  const msg = { from: req.body.email, to: process.env.EMAIL_FROM, subject: `Support ${req.body.id}`, text:  `Support case: ${req.body.id},
+
+    Hi my name is ${req.body.name},
+
+    ${req.body.message}
+  `};
+  sgMail.send(msg).then(
+    (response) => {
+      res.status(200).send({success: true, message: "Successfully sent"});
+    },
+    (error) => {
+      res.status(400).send({status: false, message: "Something went wrong"});
+    }
+  );
+})
 
 module.exports = {
   register,
@@ -164,4 +183,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   changePassword,
+  contactUs
 };

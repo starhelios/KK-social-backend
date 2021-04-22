@@ -13,9 +13,9 @@ router
   .get(validate({}), experienceController.getAll);
 router.route('/createSpecificExperience/:id').post(experienceController.createSpecificExperience);
 router.route('/rate').post(auth({}), experienceController.rateSpecificExperience);
-router.route('/build').post(auth({}), experienceController.buildUserZoomExperience);
-router.route('/build/:id').get(auth({}), experienceController.getBuiltExperience);
-router.route('/complete').post(auth({}), experienceController.completeSpecificExperience);
+router.route('/build').post(experienceController.buildUserZoomExperience);
+router.route('/build/:id').get(experienceController.getBuiltExperience);
+router.route('/complete').post(experienceController.completeSpecificExperience);
 router.route('/updateExperience').post(experienceController.updateExperience);
 
 router.route('/getHostExperiences/:userId').get(validate(), experienceController.getHostExperiencesById);
@@ -25,7 +25,7 @@ router
   .post(auth({}), validate(experienceValidation.reserveExperience), experienceController.reserveExperience); //TODO Add auth() to this route.
 router
   .route('/reserved/:reservedId')
-  .get(auth(), validate(experienceValidation.getByReservedId), experienceController.getUserBookings);
+  .get(validate(experienceValidation.getByReservedId), experienceController.getUserBookings);
 
 router.route('/uploadPhoto').post(auth({}), uploadPhotoUtil.uploader.single('image'), experienceController.uploadPhoto);
 

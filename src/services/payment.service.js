@@ -90,7 +90,7 @@ const generateStripeConnectAccountLink = async (userId) => {
       const accountLinks = await stripe.accountLinks.create({
         account: `${user.stripeConnectID}`,
         refresh_url: `${process.env.FRONTENT_ENDPOINT}/profile?type=refresh_url`,
-        return_url: `${process.env.FRONTENT_ENDPOINT}` + `profile?type=success`,
+        return_url: `${process.env.FRONTENT_ENDPOINT}` + `/profile?type=success`,
         type: 'account_onboarding',
       });
       return accountLinks.url;
@@ -103,7 +103,7 @@ const generateStripeConnectAccountLink = async (userId) => {
 
 const chargeCustomerForExperience = async (data, userID) => {
   console.log(data);
-  try {
+  // try {
     const user = await User.findOne({ _id: userID });
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -131,12 +131,12 @@ const chargeCustomerForExperience = async (data, userID) => {
           destination: `${findHostUser.stripeConnectID}`,
         },
       });
-      console.log(paymentIntent);
+      console.log('intent..',paymentIntent);
       return paymentIntent.client_secret;
     } else {
       const paymentIntent = await stripe.paymentIntents.create({
         payment_method_types: ['card'],
-        amount: data.amount,
+        amount: data.amount === 0 ? 1000: data.amount,
         currency: 'usd',
         // payment_method: findHostUser.stripeCustomerID,
         application_fee_amount: data.amount * process.env.APP_FEE,
@@ -144,14 +144,14 @@ const chargeCustomerForExperience = async (data, userID) => {
           destination: `${findHostUser.stripeConnectID}`,
         },
       });
-      console.log(paymentIntent);
+      console.log('intent..',paymentIntent);
       return paymentIntent.client_secret;
     }
-  } catch (err) {
-    //pushing local changes to override current branch
-    console.log(err.message);
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Payment method failed.');
-  }
+  // } catch (err) {
+  //   //pushing local changes to override current branch
+  //   console.log('error...',err.message);
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Payment method failed.');
+  // }
 };
 
 //Get all payments from stripe and save in DB

@@ -9,6 +9,7 @@ const sendEmail = async (to, subject, text) => {
   await sgMail.send(msg).then(
     (response) => {
       console.log(response);
+      return response;
     },
     (error) => {
       console.error(error);

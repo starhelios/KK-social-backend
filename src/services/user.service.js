@@ -80,7 +80,7 @@ const updateUserById = async (userId, updateBody) => {
   const { zoomAuthToken, email } = updateBody;
   if (zoomAuthToken && zoomAuthToken.length) {
     const response = await axios({
-      url: `https://zoom.us/oauth/token?grant_type=authorization_code&code=${zoomAuthToken}&redirect_uri=https://www.kloutkast.com/profile`,
+      url: `https://zoom.us/oauth/token?grant_type=authorization_code&code=${zoomAuthToken}&redirect_uri=https://www.kloutkast.com/profile`, //needs to reciprocate redirect for frontend
       method: 'POST',
       headers: {
         Authorization: `Basic ${Buffer.from(process.env.ZOOM_CLIENT_ID + ':' + process.env.ZOOM_CLIENT_SECRET).toString(

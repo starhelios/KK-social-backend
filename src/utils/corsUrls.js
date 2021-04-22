@@ -3,7 +3,7 @@ export const whitelistProd = [
   'https://kloutkast.herokuapp.com/',
   'https://kloutkast-zoom.herokuapp.com/',
   'https://kloutkast.com/',
-  'https://*.herokuapp.com/',
+  'https://kloutkast-zoom.herokuapp.com',
 ];
 export const corsOptions = {
   origin: function (origin, callback) {
