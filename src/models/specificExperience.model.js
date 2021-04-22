@@ -29,7 +29,6 @@ const specificExperienceSchema = mongoose.Schema(
     },
     zoomMeetingPassword: {
       type: String,
-      private: true,
     },
     ratings: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Rating' }],
     usersGoing: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User' }],

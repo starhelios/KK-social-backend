@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const axios = require('axios');
+const randomstring = require('randomstring');
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { createStripeConnectAccount } = require('./payment.service');
@@ -7,6 +8,11 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const createUser = async (userBody) => {
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  const randomString = randomstring.generate();
+  userBody.randomString = randomString;
+  if (!userBody.avatarUrl) {
+    userBody.avatarUrl = '';
   }
   const user = await User.create(userBody);
 
@@ -17,8 +23,20 @@ const getUserByEmail = async (email) => {
   return User.findOne({ email });
 };
 
-const queryUsers = async (filter, options) => {
-  const users = await User.paginate(filter, options);
+const queryUsers = async (filter) => {
+  // const users = await User.paginate(filter, options).select().exec();
+  const users = await User.find({ isHost: true })
+    .populate({
+      path: 'experiences',
+      select: ['title', 'description', 'price', 'startDay', 'endDay', 'location', 'images', 'ratings', 'categoryName'],
+      populate: {
+        path: 'specificExperience',
+        select: ['ratings'],
+      },
+    })
+    .select({ fullname: 1, avatarUrl: 1, location: 1, joinDay: 1, aboutMe: 1 })
+    .limit(10);
+
   return users;
 };
 
@@ -47,7 +65,7 @@ const getUserById = async (id) => {
     )
       .populate(populateQuery)
       .exec();
-
+    console.log('updatedUser', updatedUser);
     console.log(updatedUser);
     return updatedUser;
   } else {
@@ -62,7 +80,7 @@ const updateUserById = async (userId, updateBody) => {
   const { zoomAuthToken, email } = updateBody;
   if (zoomAuthToken && zoomAuthToken.length) {
     const response = await axios({
-      url: `https://zoom.us/oauth/token?grant_type=authorization_code&code=${zoomAuthToken}&redirect_uri=http://localhost:3000/profile`,
+      url: `https://zoom.us/oauth/token?grant_type=authorization_code&code=${zoomAuthToken}&redirect_uri=https://www.kloutkast.com/profile`, //needs to reciprocate redirect for frontend
       method: 'POST',
       headers: {
         Authorization: `Basic ${Buffer.from(process.env.ZOOM_CLIENT_ID + ':' + process.env.ZOOM_CLIENT_SECRET).toString(
@@ -87,6 +105,7 @@ const updateUserById = async (userId, updateBody) => {
         zoomId: id,
         zoomAccessToken: access_token,
         zoomRefreshToken: refresh_token,
+        zoomConnected: true,
       },
       { new: true },
       function (err, docs) {

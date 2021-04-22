@@ -6,6 +6,7 @@ const authValidation = require('../../validations/auth.validation');
 const router = express.Router();
 
 router.post('/register', validate(authValidation.register), authController.register);
+router.post('/contactUs', authController.contactUs);
 router.post('/login', validate(authValidation.login), authController.login);
 router.post('/google-login', validate(authValidation.googleLogin), authController.googleLogin);
 router.post('/logout', validate(authValidation.logout), authController.logout);
@@ -18,6 +19,5 @@ router.get(
   validate(authValidation.verifyAccount),
   authController.resetPassword
 );
-router.get('/csrf', authController.generateCsrfToken);
 
 module.exports = router;

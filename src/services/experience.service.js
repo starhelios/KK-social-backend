@@ -3,9 +3,11 @@ const moment = require('moment');
 const { Experience, User, SpecificExperience, Reservation, Rating, BuiltExperience } = require('../models');
 const axios = require('axios');
 const { populate } = require('../models/user.model');
+const randomstring = require('randomstring');
 const ApiError = require('../utils/ApiError');
 const photoUploadUtil = require('../utils/photoUpload');
 const sharp = require('sharp');
+const colors = require('colors');
 
 const getExperienceByName = async (name) => {
   return Experience.findOne({ name });
@@ -25,102 +27,109 @@ const createExperience = async (experienceBody) => {
     userId,
     specificExperiences,
   } = experienceBody;
+
   if (await Experience.isTitleTaken(title)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Experience name already taken');
   }
   //TODO Need to validate zoom email is the same as the one on our end.
-  const { location, zoomRefreshToken } = await User.findById({ _id: userId });
-  // try {
-  //   console.log('here');
-  //   const response = await axios({
-  //     url: `https://zoom.us/oauth/token?grant_type=refresh_token&refresh_token=${zoomRefreshToken}`,
-  //     method: 'POST',
-  //     headers: {
-  //       Authorization: `Basic ${Buffer.from(process.env.ZOOM_CLIENT_ID + ':' + process.env.ZOOM_CLIENT_SECRET).toString(
-  //         'base64'
-  //       )}`,
-  //     },
-  //   });
-  //   console.log('normal', response.data);
-  //   const newRefreshToken = response.data.refresh_token;
-  //   const newAccessToken = response.data.access_token;
-  //   const newUser = await User.findByIdAndUpdate(
-  //     { _id: userId },
-  //     { zoomAccessToken: newAccessToken, zoomRefreshToken: newRefreshToken },
-  //     { new: true }
-  //   );
-  //   if (newUser) {
-  //     console.log('user...', newUser);
-  //   }
-  //   const zoomId = newUser.zoomId;
-  //   const newMeetingAccessToken = newUser.zoomAccessToken;
-  //   let meetingIdArray = [];
-  //   let meetingPasswordArray = [];
-  //   const asyncForEach = new Promise((resolve, reject) => {
-  //     specificExperiences.forEach(async (item, idx) => {
-  //       const zoomStartTime = new Date(item.day + ' ' + item.startTime).toISOString();
-  //       const response = await axios({
-  //         url: `https://api.zoom.us/v2/users/${zoomId}/meetings`,
-  //         method: 'POST',
-  //         headers: {
-  //           Authorization: `Bearer ${newMeetingAccessToken}`,
-  //         },
-  //         data: {
-  //           start_time: zoomStartTime,
-  //           duration: duration,
-  //           password: '',
-  //           settings: {
-  //             approval_type: 1,
-  //             waiting_room: true, //this overrides join before host
-  //           },
-  //         },
-  //       });
-  //       if (response && response.data && response.data.id) {
-  //         console.log('pushing');
-  //         meetingIdArray.push(response.data.id);
-  //         meetingPasswordArray.push(response.data.password);
-  //       }
-  //       if (idx === specificExperiences.length - 1) {
-  //         resolve();
-  //       }
-  //     });
-  //   });
-  // asyncForEach.then(async () => {
-  const newExperience = {
-    title,
-    description,
-    duration,
-    price,
-    images,
-    startDay,
-    endDay,
-    categoryName,
-    userId,
-    location,
-  };
-  // console.log('meeting array', meetingIdArray);
-  const savedExperience = await Experience.create(newExperience);
-  const pushToUser = await User.findByIdAndUpdate({ _id: userId }, { $push: { experiences: savedExperience._id } });
-  specificExperiences.forEach((element, idx) => {
-    element.imageUrl = savedExperience.images[0];
-    element.experience = savedExperience._id;
-    // element.zoomMeetingId = meetingIdArray[idx];
-    // element.zoomMeetingPassword = meetingPasswordArray[idx];
-  });
-  const savedSpecificExperiences = await SpecificExperience.insertMany(specificExperiences);
-  let experienceIds = savedSpecificExperiences.map((item, idx) => {
-    return item._id;
-  });
-  const pushToExperienceModel = await Experience.findByIdAndUpdate(
-    { _id: savedExperience._id },
-    { $push: { specificExperience: experienceIds } }
-  );
-  console.log('success...');
-  return { savedExperience, savedSpecificExperiences, pushToExperienceModel };
-  // });
-  // } catch (err) {
-  console.log(err);
-  // }
+  const { location, zoomRefreshToken, _id } = await User.findOne({ randomString: userId });
+  console.log(colors.yellow(location));
+  try {
+    console.log('here');
+    const response = await axios({
+      url: `https://zoom.us/oauth/token?grant_type=refresh_token&refresh_token=${zoomRefreshToken}`,
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${Buffer.from(process.env.ZOOM_CLIENT_ID + ':' + process.env.ZOOM_CLIENT_SECRET).toString(
+          'base64'
+        )}`,
+      },
+    });
+    console.log('normal', response.data);
+    const newRefreshToken = response.data.refresh_token;
+    const newAccessToken = response.data.access_token;
+    const newUser = await User.findByIdAndUpdate(
+      { _id: _id },
+      { zoomAccessToken: newAccessToken, zoomRefreshToken: newRefreshToken },
+      { new: true }
+    );
+    if (newUser) {
+      console.log('user...', newUser);
+    }
+    const zoomId = newUser.zoomId;
+    const newMeetingAccessToken = newUser.zoomAccessToken;
+    let meetingIdArray = [];
+    let meetingPasswordArray = [];
+    const asyncForEach = new Promise((resolve, reject) => {
+      specificExperiences.forEach(async (item, idx) => {
+        const zoomStartTime = new Date(item.day + ' ' + item.startTime).toISOString();
+        const response = await axios({
+          url: `https://api.zoom.us/v2/users/${zoomId}/meetings`,
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${newMeetingAccessToken}`,
+          },
+          data: {
+            start_time: zoomStartTime,
+            duration: duration,
+            password: '',
+            settings: {
+              approval_type: 1,
+              waiting_room: true, //this overrides join before host
+            },
+          },
+        });
+        if (response && response.data && response.data.id) {
+          console.log('pushing');
+          meetingIdArray.push(response.data.id);
+          meetingPasswordArray.push(response.data.password);
+        }
+        if (idx === specificExperiences.length - 1) {
+          resolve();
+        }
+      });
+    });
+    asyncForEach.then(async () => {
+      const newExperience = {
+        title,
+        randomString: randomstring.generate(),
+        description,
+        duration,
+        price,
+        images,
+        startDay,
+        endDay,
+        categoryName,
+        userId: _id,
+        location,
+      };
+      // console.log('meeting array', meetingIdArray);
+      const savedExperience = await Experience.create(newExperience);
+      const pushToUser = await User.findOneAndUpdate(
+        { randomString: userId },
+        { $push: { experiences: savedExperience._id } }
+      );
+      specificExperiences.forEach((element, idx) => {
+        element.imageUrl = savedExperience.images[0];
+        element.experience = savedExperience._id;
+        element.randomString = randomstring.generate();
+        element.zoomMeetingId = meetingIdArray[idx];
+        element.zoomMeetingPassword = meetingPasswordArray[idx];
+      });
+      const savedSpecificExperiences = await SpecificExperience.insertMany(specificExperiences);
+      let experienceIds = savedSpecificExperiences.map((item, idx) => {
+        return item._id;
+      });
+      const pushToExperienceModel = await Experience.findByIdAndUpdate(
+        { _id: savedExperience._id },
+        { $push: { specificExperience: experienceIds } }
+      );
+      console.log('success...');
+      return { savedExperience, savedSpecificExperiences, pushToExperienceModel };
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const createSpecificExperience = async (experienceBody, id) => {
@@ -173,12 +182,14 @@ const rateSpecificExperience = async (data) => {
 };
 
 const updateExperience = async (data) => {
+  // console.log(data);
   let newSpecificExperiences = [];
   let notNewSpecificExperiences = [];
   let newIds = [];
   let notNewIds = [];
   // console.log(data);
   const { title, description, duration, price, categoryName, id } = data;
+  //! data is being received correctly on backend
 
   const promise = new Promise((resolve, reject) => {
     data.specificExperiences.map((item, idx) => {
@@ -189,63 +200,79 @@ const updateExperience = async (data) => {
       }
       if (idx === data.specificExperiences.length - 1) {
         console.log('resolving one');
+        // console.log('new...', newSpecificExperiences);
         resolve();
       }
     });
-  });
-  const promiseTwo = new Promise((resolve, reject) => {
-    notNewSpecificExperiences.forEach(async (item, idx) => {
-      const updatedSpecificExperience = await SpecificExperience.findByIdAndUpdate(
-        item.id,
-        { ...item },
-        { upsert: true, new: true }
-      );
-      console.log(updatedSpecificExperience);
-      notNewIds.push(updatedSpecificExperience._id);
-      if (idx === notNewSpecificExperiences.length - 1) {
-        console.log('resolving two');
-        resolve();
-      }
-    });
-  });
+  }).catch((err) => console.log(err));
 
-  const promiseThree = new Promise((resolve, reject) => {
-    if (newSpecificExperiences.length)
-      newSpecificExperiences.forEach(async (item, idx) => {
-        const createdSpecificExperience = await SpecificExperience.create({ ...item }).catch((err) => {
-          throw err;
-        });
-        // console.log(createdSpecificExperience);
-        newIds.push(createdSpecificExperience._id);
-        if (idx === newSpecificExperiences.length - 1) {
-          console.log('resolving three');
+  const promiseTwo = new Promise((resolve, reject) => {
+    console.log('running two');
+    // console.log(notNewSpecificExperiences);
+    if (notNewSpecificExperiences.length) {
+      notNewSpecificExperiences.forEach(async (item, idx) => {
+        const updatedSpecificExperience = await SpecificExperience.findByIdAndUpdate(
+          item.id,
+          { ...item },
+          { upsert: true, new: true }
+        );
+        console.log(updatedSpecificExperience);
+        notNewIds.push(updatedSpecificExperience._id);
+        if (idx === notNewSpecificExperiences.length - 1) {
+          console.log('resolving two');
           resolve();
         }
       });
-    else {
-      console.log('resolving three');
+    } else {
+      console.log('resolving two');
       resolve();
     }
-  });
+  }).catch((err) => console.log(err));
 
-  const promisedAll = Promise.all([promise, promiseTwo, promiseThree]).then(async (res) => {
-    const allIds = notNewIds.concat(newIds);
-    await Experience.updateOne(
-      { _id: id },
-      {
-        $unset: { specificExperience: 1 },
+  const promiseThree = new Promise(async (resolve, reject) => {
+    if (newSpecificExperiences.length > 0) {
+      // console.log('new third...', newSpecificExperiences);
+      const createdSpecificExperience = await SpecificExperience.insertMany(newSpecificExperiences);
+      console.log(createdSpecificExperience);
+      if (createdSpecificExperience.length > 0) {
+        console.log('its longer than 0');
+        createdSpecificExperience.forEach((item, idx) => {
+          newIds.push(item._id);
+          if (idx === newSpecificExperiences.length - 1) {
+            console.log('resolving three');
+            console.log(newIds);
+            resolve();
+          }
+        });
+      } else {
+        console.log('resolving three');
+        console.log(newIds);
+        resolve();
       }
-    );
-    const pushAllUpdatedExperience = await Experience.findByIdAndUpdate(
-      id,
-      { $push: { specificExperience: allIds }, title, duration, price, description, categoryName },
-      {
-        upsert: true,
-        new: true,
-      }
-    );
-    console.log('updated user experiences...', pushAllUpdatedExperience);
-  });
+    }
+  }).catch((err) => console.log(err));
+  const promiseAll = Promise.all([promise, promiseTwo, promiseThree]);
+  promiseAll
+    .then(async function (res) {
+      console.log('running in all');
+      const allIds = notNewIds.concat(newIds);
+      await Experience.updateOne(
+        { _id: id },
+        {
+          $unset: { specificExperience: 1 },
+        }
+      );
+      const pushAllUpdatedExperience = await Experience.findByIdAndUpdate(
+        id,
+        { $push: { specificExperience: allIds }, title, duration, price, description, categoryName },
+        {
+          upsert: true,
+          new: true,
+        }
+      );
+      console.log('updated user experiences...', pushAllUpdatedExperience);
+    })
+    .catch((err) => console.log(err));
   return 'Successfully updated experience';
 };
 
@@ -263,7 +290,7 @@ const reserveExperience = async (data) => {
 
 const getAll = async (query) => {
   const experiences = await Experience.find(query);
-
+  console.log('experiences...', experiences);
   const result = experiences.filter((item) => {
     const today = new Date();
     const endDay = new Date(item.endDay);
@@ -276,11 +303,13 @@ const getAll = async (query) => {
 const getExperienceById = async (id) => {
   const populateQuery = {
     path: 'specificExperience',
+    select: { day: 1, ratings: 1, startTime: 1, endTime: 1, randomString: 1 },
     populate: {
       path: 'ratings',
       model: 'Rating',
     },
   };
+  // const { images, title, location, duration, categoryName, description, price, specificExperience } = experience;
   const findExperience = await Experience.findOne({ _id: id }).populate(populateQuery).exec();
 
   if (!findExperience) {
@@ -334,12 +363,17 @@ const getExperienceById = async (id) => {
 };
 
 const getHostExperiencesById = async (id) => {
-  const experiences = await Experience.find({ userId: id }).populate({
-    path: 'specificExperience',
-    populate: {
-      path: 'experience',
-    },
-  });
+  console.log('getting experiences by id');
+  const experiences = await Experience.find({ userId: id })
+    .populate({
+      path: 'specificExperience',
+      select: ['day', 'endTime', 'ratings', 'id', 'experience', 'completed', 'startTime', 'usersGoing'],
+      populate: {
+        path: 'experience',
+        select: ['images', 'title'],
+      },
+    })
+    .select('specificExperience');
   return experiences;
 };
 
@@ -347,6 +381,7 @@ const getUserBookings = async (id) => {
   const populateQuery = [
     {
       path: 'experience',
+      select: { images: 1, title: 1 },
       populate: {
         path: 'specificExperience',
         model: 'Specific Experience',
@@ -356,10 +391,13 @@ const getUserBookings = async (id) => {
       path: 'ratings',
     },
   ];
-  const userBookings = await SpecificExperience.find({ usersGoing: id }).populate(populateQuery).exec();
-  console.log(userBookings);
-  if (!userBookings) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Bookings not found');
+  const userBookings = await SpecificExperience.find({ usersGoing: id })
+    .select({ day: 1, startTime: 1, usersGoing: 1, completed: 1, endTime: 1, ratings: 1, experience: 1 })
+    .populate(populateQuery)
+    .exec();
+  console.log('userbookings...', userBookings);
+  if (!userBookings.length) {
+    return [];
   }
   return userBookings;
 };
@@ -390,7 +428,7 @@ const deleteExperienceById = async (categoryId) => {
 };
 const buildUserZoomExperience = async (body) => {
   const specificExperience = await SpecificExperience.findById(body.specificExperienceId).populate('experience');
-  const user = await User.findById(body.userId);
+  const user = await User.findOne({ randomString: body.userId });
   const { userRole } = body;
   const { zoomMeetingId, zoomMeetingPassword } = specificExperience;
   const title = specificExperience.experience.title;
@@ -436,14 +474,25 @@ const completeSpecificExperience = async (body) => {
     console.log(err);
   }
 };
-const uploadPhoto = async (photo) => {
+const uploadPhoto = async (photo, path) => {
   try {
-    const resizedImageBuffer = await sharp(photo.buffer)
-      .resize(231, 309)
-      .toBuffer()
-      .catch((err) => {
-        console.log(err);
-      });
+    console.log(photo);
+    let resizedImageBuffer;
+    if (path === '/v1/experiences/uploadPhoto') {
+      resizedImageBuffer = await sharp(photo.buffer)
+        .resize(415, 415)
+        .toBuffer()
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      resizedImageBuffer = await sharp(photo.buffer)
+        .resize(232)
+        .toBuffer()
+        .catch((err) => {
+          console.log(err);
+        });
+    }
     const splitFileName = photo.originalname.split('.');
     const filename = splitFileName[0];
     const extension = splitFileName[1];

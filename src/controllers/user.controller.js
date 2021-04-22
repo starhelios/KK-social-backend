@@ -6,6 +6,7 @@ const { userService } = require('../services');
 const { categoryService } = require('../services');
 const { generateResponse } = require('../utils/utils');
 const Category = require('../models/category.model');
+const colors = require('colors');
 
 const mimeMatch = {
   'image/png': 'png',
@@ -23,22 +24,65 @@ const mimeMatch = {
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
-  res.status(httpStatus.CREATED).send(user);
+  const newUser = {
+    status: user.status,
+    fullname: user.fullname,
+    email: user.email,
+    randomString: user.randomString,
+    avatarUrl: user.avatarUrl,
+  };
+  res.status(httpStatus.CREATED).send(newUser);
 });
 
 const getUsers = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'role']);
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await userService.queryUsers(filter, options);
+  // const filter = pick(req.query, ['name', 'role']);
+  // const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await userService.queryUsers();
   res.send(result);
 });
 
 const getUser = catchAsync(async (req, res) => {
-  const user = await userService.getUserById(req.params.userId);
+  let user = await userService.getUserById(req.params.userId);
+  console.log(colors.red('this is the user', user));
 
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
+  console.log(colors.bgCyan(user));
+  const {
+    experiences,
+    fullname,
+    email,
+    avatarUrl,
+    zoomConnected,
+    isHost,
+    status,
+    images,
+    randomString,
+    availableMethods,
+    dateOfBirth,
+    location,
+    aboutMe,
+    stripeAccountVerified,
+  } = user;
+  const newUser = {
+    experiences,
+    fullname,
+    email,
+    avatarUrl,
+    zoomConnected,
+    isHost,
+    status,
+    images,
+    randomString,
+    availableMethods,
+    dateOfBirth,
+    location,
+    aboutMe,
+    stripeAccountVerified,
+  };
+
+  user = newUser;
 
   res.send(generateResponse(true, user));
 });
@@ -46,7 +90,6 @@ const getUser = catchAsync(async (req, res) => {
 const getHost = catchAsync(async (req, res) => {
   // const userID = req.user._id;
   const user = await userService.getUserById(req.params.userId);
-
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Host not found');
   }
@@ -55,9 +98,10 @@ const getHost = catchAsync(async (req, res) => {
 });
 
 const getHosts = catchAsync(async (req, res) => {
-  const filter = { isHost: true };
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await userService.queryUsers(filter, options);
+  // const filter = { isHost: true };
+  // const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await userService.queryUsers();
+  console.log(colors.green(result));
 
   res.send(generateResponse(true, result));
 });
@@ -93,6 +137,38 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const addBank = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bankInfo.push(req.body);
+  user.save();
+
+  res.send(generateResponse(true, user, 'Add Bank successed!'));
+});
+
+const deleteBank = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bankInfo.id(req.params.id).remove();
+  user.save();
+
+  res.send(generateResponse(true, user, 'Delete Bank successed!'));
+});
+
+const reservationBooking = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bookingInfo.push(req.body);
+  user.save();
+
+  res.send(generateResponse(true, user, 'Add Booking successed!'));
+});
+
+const joinBooking = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+  user.bookingInfo.id(req.params.id).completed = true;
+  user.save();
+
+  res.send(generateResponse(true, user, 'Update Booking successed!'));
+});
+
 module.exports = {
   createUser,
   getUsers,
@@ -101,4 +177,8 @@ module.exports = {
   deleteUser,
   getHosts,
   getHost,
+  addBank,
+  deleteBank,
+  reservationBooking,
+  joinBooking,
 };

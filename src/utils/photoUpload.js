@@ -7,7 +7,6 @@ const uploader = multer({
     files: 1,
   },
 });
-
 const storage = new Storage({
   projectId: process.env.GCLOUD_PROJECT_ID,
   keyFilename: process.env.GCLOUD_APPLICATION_CREDENTIALS,

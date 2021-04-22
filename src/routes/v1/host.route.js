@@ -7,6 +7,7 @@ const userController = require('../../controllers/user.controller');
 const router = express.Router();
 
 router.route('/').get(validate(userValidation.getHosts), userController.getHosts);
-router.route('/:userId').get(validate({}), userController.getHost);
+
+router.route('/:hostId').get(validate({}), userController.getHost);
 
 module.exports = router;

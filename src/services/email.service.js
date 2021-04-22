@@ -7,7 +7,10 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const sendEmail = async (to, subject, text) => {
   const msg = { from: process.env.EMAIL_FROM, to, subject, text };
   await sgMail.send(msg).then(
-    () => {},
+    (response) => {
+      console.log(response);
+      return response;
+    },
     (error) => {
       console.error(error);
 
@@ -23,7 +26,8 @@ const sendResetPasswordEmail = async (to, token) => {
   // replace this url with the link to the reset password page of your front-end app
   const resetPasswordUrl = `${process.env.FRONTENT_ENDPOINT}?token=${token}`;
   const text = `Dear user,
-  To reset your password, click on this link: ${resetPasswordUrl}
+  To reset your password, click on this link, then click login \n\n${resetPasswordUrl}\n\n
+
   If you did not request any password resets, then ignore this email.`;
   await sendEmail(to, subject, text);
 };

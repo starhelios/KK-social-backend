@@ -28,6 +28,12 @@ const getById = {
   }),
 };
 
+const getByReservedId = {
+  params: Joi.object().keys({
+    reservedId: Joi.string().custom(objectId),
+  }),
+};
+
 const reserveExperience = {
   body: Joi.object().keys({
     userId: Joi.string(),
@@ -59,6 +65,7 @@ module.exports = {
   createExperience,
   getAll,
   getById,
+  getByReservedId,
   addSpecificExperience,
   removeDateAvaibility,
   reserveExperience,

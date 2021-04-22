@@ -63,8 +63,8 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
       return false;
     }
     await Token.deleteMany({ user: user.id, type: tokenTypes.RESET_PASSWORD });
-    await userService.updateUserById(user.id, { password: newPassword });
-
+    const hashedPassword = await bcrypt.hash(newPassword, 8);
+    await userService.updateUserById(user.id, { password: hashedPassword });
     return true;
   } catch (error) {
     return false;
